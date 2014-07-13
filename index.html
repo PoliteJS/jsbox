@@ -21,6 +21,15 @@
             font-family: monospace;
         }
         .jsbox-test {
+            margin:0;
+            padding:0;
+            list-style: none;
+        }
+        .jsbox-test li {
+            margin-top: 2px;
+            margin-bottom:2px;
+            display: block;
+            width: 450px;
             border: 1px solid #666;
             border-radius: 5px;
             padding:5px;
@@ -30,10 +39,10 @@
             text-shadow: 0 1px #fff;
             font-family: monospace;
         }
-        .jsbox-test.success {
+        .jsbox-test li.success {
             background: rgba(0, 128, 0, 0.29);
         }
-        .jsbox-test.failure {
+        .jsbox-test li.failure {
             background: rgba(128, 0, 0, 0.29);
         }
         </style>
@@ -47,22 +56,26 @@
         <hr>
 
         <div class="jsbox">
-<pre>
-var done = this.async();
+            <code>var done = this.async();
 var a;
 setTimeout(function() {
     a = 'marco';
     done();
-}, 1000);
-</pre>
-<pre>a === 'marco'</pre>
+}, 10);
+</code>
+            <ul>
+                <li>a === 'marco'</li>
+                <li>a.length === 6</li>
+            </ul>
         </div>
 
         <hr>
 
         <div class="jsbox">
-            <pre>console.log('foo');</pre>
-            <pre>pippo.indexOf('a') === -1</pre>
+            <code>var a = 'pippo';</code>
+            <ul>
+                <li>a === 'pluto'</li>
+            </ul>
         </div>
         
         <hr>
@@ -74,7 +87,7 @@ setTimeout(function() {
         <script>
             $('#jsbox').jsbox({
                 code: 'var a = true;',
-                test: 'a === true'
+                tests: ['a === true']
             });
             $('.jsbox').jsbox();
             

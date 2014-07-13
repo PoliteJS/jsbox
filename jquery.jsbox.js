@@ -21,7 +21,7 @@
             this.source = '';
             loadSourceCode(this);
             
-            this.test = '';
+            this.tests = [];
             loadTestCode(this);
             
             initDOM(this);
@@ -47,8 +47,8 @@
     };
     
     function loadSourceCode(box) {
-        if (!box.config.code && box.config.codeSrc) {
-            box.source = box.$el.find(box.config.codeSrc).text();
+        if (!box.config.code && box.config.codeQuery) {
+            box.source = box.$el.find(box.config.codeQuery).text();
         } else {
             box.source = box.config.code;
         }
@@ -56,12 +56,14 @@
     };
     
     function loadTestCode(box) {
-        if (!box.config.test && box.config.testSrc) {
-            box.test = box.$el.find(box.config.testSrc).text();
+        if (!box.config.tests.length && box.config.testsQuery) {
+            box.tests = []
+            box.$el.find(box.config.testsQuery).each(function() {
+                box.tests.push($(this).text());
+            });
         } else {
-            box.test = box.config.test;
+            box.tests = box.config.tests;
         }
-        box._originalSource = box.source;
     };
     
     // DOM
@@ -71,7 +73,12 @@
         
         box.$editor = $('<div class="jsbox-editor">');
         box.$console = $('<div class="jsbox-console">');
-        box.$test = $('<pre class="jsbox-test">').text(box.test);
+        
+        box.$tests = $('<ul class="jsbox-test">');
+        box.tests.forEach(function(test) {
+            box.$tests.append($('<li>').text(test));
+        });
+        
         box.$sandbox = $('<iframe class="jsbox-sandbox">').hide();
         box.$runBtn = $('<button>').text('run');
         box.$resetBtn = $('<button>').text('reset');
@@ -82,7 +89,7 @@
         box.$el
             .append(box.$editor)
             .append(box.$console)
-            .append(box.$test)
+            .append(box.$tests)
             .append(box.$sandbox)
             .append(box.$runBtn)
             .append(box.$resetBtn);
@@ -91,7 +98,7 @@
     function disposeDOM(box) {
         box.$editor.remove();
         box.$console.remove();
-        box.$test.remove();
+        box.$tests.remove();
         box.$sandbox.remove();
         box.$runBtn.off().remove();
         box.$resetBtn.off().remove();
@@ -114,16 +121,17 @@
     function initSandbox(box) {
         var sandbox = box.config.sandbox || defaultSandbox;
         box.sandbox = Object.create(sandbox);
-        box.sandbox.init(box.$sandbox[0], box.test);
+        box.sandbox.init(box.$sandbox[0], box.tests);
         
-        box.sandbox.on('success', function() {
-            box.$test.addClass('success');
+        box.sandbox.on('success', function(index) {
+            box.$tests.find(':eq(' + index + ')').addClass('success');
         });
-        box.sandbox.on('failure', function() {
-            box.$test.addClass('failure');
+        box.sandbox.on('failure', function(index) {
+            box.$tests.find(':eq(' + index + ')').addClass('failure');
         });
         box.sandbox.on('reset', function() {
-            box.$test.removeClass('success').removeClass('failure');
+            box.$tests.find('.success').removeClass('success');
+            box.$tests.find('.failure').removeClass('failure');
         });
     }
     
@@ -183,9 +191,9 @@
     var defaultSandbox = (function() {
         
         var sandbox = {
-            init: function(el, test) {
+            init: function(el, tests) {
                 this.el = el;
-                this.test = test;
+                this.tests = tests;
                 this._subs = {
                     success: [],
                     failure: [],
@@ -201,13 +209,10 @@
                 return this;
             },
             run: function(source) {
-                
                 var self = this;
-                
-                execute(this.el, source, this.test, function(result) {
-                    trigger(self, result ? 'success' : 'failure');
+                execute(this.el, source, this.tests, function(test, index, result) {
+                    trigger(self, result ? 'success' : 'failure', index, test);
                 });
-                
             }
         };
         
@@ -220,7 +225,7 @@
             });
         }
         
-        function execute(box, source, test, callback) {
+        function execute(box, source, tests, callback) {
             var async = false;
             var scope = box.contentWindow;
             var body = scope.document.body;
@@ -228,8 +233,12 @@
             body.innerHTML = '';
             
             function test() {
-                scope.sandboxTestResultsHandler = callback.bind(scope);
-                makeScriptEl('sandboxTestResultsHandler(' + test + ')', body);
+                tests.forEach(function(test, index) {
+                    scope.sandboxTestResultsHandler = function(result) {
+                        callback.call(scope, test, index, result);
+                    };
+                    makeScriptEl('sandboxTestResultsHandler(' + test + ')', body);
+                });
             }
             
             scope.async = function() {
@@ -300,9 +309,9 @@
      */
     $.jsboxDefaults = {
         code: '',
-        codeSrc: 'pre:first',
-        test: '',
-        testSrc: 'pre:last',
+        codeQuery: 'code',
+        tests: [],
+        testsQuery: 'ul>li',
         editor: null, // custom editor adapter
         sandbox: null, // custom text execution sandbox 
         updateDelay: 300
