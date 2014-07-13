@@ -237,7 +237,7 @@
                     scope.sandboxTestResultsHandler = function(result) {
                         callback.call(scope, test, index, result);
                     };
-                    makeScriptEl('sandboxTestResultsHandler(' + test + ')', body);
+                    makeScriptEl('try {sandboxTestResultsHandler(' + test + ');} catch (e) {sandboxTestResultsHandler(false);}', body);
                 });
             }
             
