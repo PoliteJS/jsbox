@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8">
+    	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+        <title>JSBox - run live JS Exercises!</title>
+        
+        <style>
+        .jsbox-default-editor {
+            display: block;
+            width: 450px;
+            height: 120px;
+            background: #666;
+            color: #fafafa;
+            text-shadow: 0 1px #000;
+            border: none;
+            border-radius: 5px;
+            padding:5px;
+            font-size: 12pt;
+            font-family: monospace;
+        }
+        .jsbox-test {
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding:5px;
+            font-size: 12pt;
+            background: #ddd;
+            color: 333;
+            text-shadow: 0 1px #fff;
+            font-family: monospace;
+        }
+        .jsbox-test.success {
+            background: rgba(0, 128, 0, 0.29);
+        }
+        .jsbox-test.failure {
+            background: rgba(128, 0, 0, 0.29);
+        }
+        </style>
+        
+    </head>
+    <body>
+       
+
+        <div id="jsbox"></div>
+
+        <hr>
+
+        <div class="jsbox">
+<pre>
+var done = this.async();
+var a;
+setTimeout(function() {
+    a = 'marco';
+    done();
+}, 1000);
+</pre>
+<pre>a === 'marco'</pre>
+        </div>
+
+        <hr>
+
+        <div class="jsbox">
+            <pre>console.log('foo');</pre>
+            <pre>pippo.indexOf('a') === -1</pre>
+        </div>
+        
+        <hr>
+        
+        <button id="dispose">Dispose All</button>
+       
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="jquery.jsbox.js"></script>
+        <script>
+            $('#jsbox').jsbox({
+                code: 'var a = true;',
+                test: 'a === true'
+            });
+            $('.jsbox').jsbox();
+            
+            $('#dispose').click(function() {
+                $('#jsbox, .jsbox').jsbox('dispose');
+            });
+        </script>
+       
+    </body>
+</html>
