@@ -237,12 +237,21 @@
             run: function(source, tests) {
                 var self = this;
                 
+                // test for syntax error in source code
+                try {
+                    var fn = new Function(source);  
+                } catch(e) {
+                    trigger(this, 'exception', e);
+                    trigger(this, 'stop');
+                }
+                
                 var publishEvent = function() {
                     var args = Array.prototype.slice.call(arguments);
                     args.unshift(self);
                     trigger.apply(null, args);
                 };
                 
+                // execute source and tests
                 trigger(this, 'start');
                 execute(this.el, source, tests, publishEvent, function(test, index, result) {
                     trigger(self, 'stop');
@@ -309,13 +318,9 @@
             
             
             // run the source code and test
-            var err = makeScriptEl(source, body);
-            if (!async && !err) {
+            makeScriptEl(source, body);
+            if (!async) {
                 test()
-            } else {
-                publishEvent('exception', err);
-                publishEvent('stop');
-                target.removeChild(box);
             }
         }
         
@@ -323,17 +328,10 @@
             var el = document.createElement('script');
             el.type = 'text/javascript';
             el.appendChild(document.createTextNode(source));
-            
-            try {
-                (function() {
-                    var fn = new Function(source);  
-                })();
-                if (target) {
-                    target.appendChild(el);
-                }
-            } catch (e) {
-                return e;
+            if (target) {
+                target.appendChild(el);
             }
+            return el;
         }
         
         function log2string(args) {
