@@ -20,11 +20,6 @@
             font-size: 12pt;
             font-family: monospace;
         }
-        .jsbox-test {
-            margin:0;
-            padding:0;
-            list-style: none;
-        }
         .jsbox-sandbox {
             display: none;
         }
@@ -33,6 +28,14 @@
             background: red;
             color: #eee;
             text-shadow: 0 1px #333;
+        }
+        .jsbox-test {
+            margin:0;
+            padding:0;
+            list-style: none;
+        }
+        .jsbox-test.running li {
+            background: rgba(63, 141, 208, 0.62);
         }
         .jsbox-test li {
             margin-top: 2px;
@@ -54,13 +57,27 @@
         .jsbox-test li.failure {
             background: rgba(128, 0, 0, 0.29);
         }
+        .jsbox-console {
+            margin:0;
+            padding:0;
+            font-family: monospace;
+            font-size: 9pt;
+        }
+        
+        .jsbox-console li:before {
+            content: '> ';
+        }
+        .jsbox-console li {
+            margin: 2px;
+        }
         </style>
         
     </head>
     <body>
     
         <div class="jsbox">
-            <code>a = true;b = 1;aaa</code>
+<code>console.log('foo', 123, true, [1, 2, 3], {a:1, b:'aa'}, function() {return 123;});
+console.log(new Date());</code>
             <ul>
                 <li>a === true</li>
                 <li>typeof b === 'boolean'</li>
@@ -102,7 +119,7 @@ setTimeout(function() {
         <button id="enable">Enable JSBox</button>
         <button id="disable">Disable JSBox</button>
        
-        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="jquery-2.1.1.min.js"></script>
         <script src="jquery.jsbox.js"></script>
         <script>
 //            $('#jsbox').jsbox({
