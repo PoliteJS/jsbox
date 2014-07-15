@@ -309,18 +309,31 @@
             
             
             // run the source code and test
-            makeScriptEl(source, body);
-            if (!async) {test()}
+            var err = makeScriptEl(source, body);
+            if (!async && !err) {
+                test()
+            } else {
+                publishEvent('exception', err);
+                publishEvent('stop');
+                target.removeChild(box);
+            }
         }
         
         function makeScriptEl(source, target) {
             var el = document.createElement('script');
             el.type = 'text/javascript';
             el.appendChild(document.createTextNode(source));
-            if (target) {
-                target.appendChild(el);
+            
+            try {
+                (function() {
+                    var fn = new Function(source);  
+                })();
+                if (target) {
+                    target.appendChild(el);
+                }
+            } catch (e) {
+                return e;
             }
-            return el;
         }
         
         function log2string(args) {
