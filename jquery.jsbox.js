@@ -42,7 +42,7 @@
             this.setSource(this._originalSource);
         },
         run: function() {
-            this.sandbox.reset().run(this.source);
+            this.sandbox.reset().run(this.source, this.tests);
         }
     };
     
@@ -79,7 +79,9 @@
             box.$tests.append($('<li>').text(test));
         });
         
-        box.$sandbox = $('<iframe class="jsbox-sandbox">').hide();
+        box.$sandbox = $('<div class="jsbox-sandbox">');
+        box.$exception = $('<div class="jsbox-exception">');
+        
         box.$runBtn = $('<button>').text('run');
         box.$resetBtn = $('<button>').text('reset');
         
@@ -91,6 +93,7 @@
             .append(box.$console)
             .append(box.$tests)
             .append(box.$sandbox)
+            .append(box.$exception)
             .append(box.$runBtn)
             .append(box.$resetBtn);
     }
@@ -100,6 +103,7 @@
         box.$console.remove();
         box.$tests.remove();
         box.$sandbox.remove();
+        box.$exception.remove();
         box.$runBtn.off().remove();
         box.$resetBtn.off().remove();
         box.$el.html(box._originalHTML);
@@ -121,7 +125,7 @@
     function initSandbox(box) {
         var sandbox = box.config.sandbox || defaultSandbox;
         box.sandbox = Object.create(sandbox);
-        box.sandbox.init(box.$sandbox[0], box.tests);
+        box.sandbox.init(box.$sandbox[0]);
         
         box.sandbox.on('success', function(index) {
             box.$tests.find(':eq(' + index + ')').addClass('success');
@@ -130,9 +134,15 @@
             box.$tests.find(':eq(' + index + ')').addClass('failure');
         });
         box.sandbox.on('reset', function() {
+            box.$exception.html('').hide();
             box.$tests.find('.success').removeClass('success');
             box.$tests.find('.failure').removeClass('failure');
         });
+        box.sandbox.on('exception', function(e) {
+            box.$exception.html(e.message).show();
+        });
+        
+        box.sandbox.reset();
     }
     
     function disposeSandbox(box) {
@@ -191,12 +201,12 @@
     var defaultSandbox = (function() {
         
         var sandbox = {
-            init: function(el, tests) {
+            init: function(el) {
                 this.el = el;
-                this.tests = tests;
                 this._subs = {
                     success: [],
                     failure: [],
+                    exception: [],
                     reset: []
                 };
             },
@@ -208,29 +218,40 @@
                 trigger(this, 'reset');
                 return this;
             },
-            run: function(source) {
+            run: function(source, tests) {
                 var self = this;
-                execute(this.el, source, this.tests, function(test, index, result) {
+                var publishEvent = function() {
+                    var args = Array.prototype.slice.call(arguments);
+                    args.unshift(self);
+                    trigger.apply(null, args);
+                };
+                execute(this.el, source, tests, publishEvent, function(test, index, result) {
                     trigger(self, result ? 'success' : 'failure', index, test);
                 });
             }
         };
         
-        function trigger() {
+        function trigger(runner, event) {
             var args = Array.prototype.slice.call(arguments);
-            var runner = args.shift();
-            var event = args.shift();
+            args.shift();
+            args.shift();
             runner._subs[event].forEach(function(cb) {
                 cb.apply(null, args);
             });
         }
         
-        function execute(box, source, tests, callback) {
+        function execute(sandbox, source, tests, publishEvent, callback) {
+            // one shot iframe where to run the code and tests
+            var box = document.createElement('iframe');
+            sandbox.appendChild(box);
+            
             var async = false;
             var scope = box.contentWindow;
             var body = scope.document.body;
             
-            body.innerHTML = '';
+            scope.sandboxCatchErrors = function(e) {
+                publishEvent('exception', e);
+            };
             
             function test() {
                 tests.forEach(function(test, index) {
@@ -239,12 +260,15 @@
                     };
                     makeScriptEl('try {sandboxTestResultsHandler(' + test + ');} catch (e) {sandboxTestResultsHandler(false);}', body);
                 });
+                sandbox.removeChild(box);
             }
             
             scope.async = function() {
                 async = true;
                 return test;
             };
+            
+            var source = 'try {' + source + '} catch(e) { sandboxCatchErrors(e); }';
             
             makeScriptEl(source, body);
             
@@ -266,6 +290,30 @@
         }
         
         return sandbox;
+        
+    })();
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // --------------------------------------------------------- //
+    // ---[   D E F A U L T   C O N S O L E   L O G G E R   ]--- //
+    // --------------------------------------------------------- //
+    
+    var defaultConsole = (function() {
+        
+        var console = {};
+        
+        
+        return console;
+    
     })();
     
     
@@ -287,9 +335,13 @@
      * so it is accessible in every moment.
      */
     function init(config) {
+        var $this = $(this);
+        if ($this.data('jsbox')) {
+            return;
+        }
         var instance = Object.create(JSBox);
         instance.init(this, config);
-        $(this).data('jsbox', instance);
+        $this.data('jsbox', instance);
     }
     
     /**
@@ -314,6 +366,7 @@
         testsQuery: 'ul>li',
         editor: null, // custom editor adapter
         sandbox: null, // custom text execution sandbox 
+        console: null, // custom console logger
         updateDelay: 300
     };
     

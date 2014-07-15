@@ -25,6 +25,15 @@
             padding:0;
             list-style: none;
         }
+        .jsbox-sandbox {
+            display: none;
+        }
+        .jsbox-exception {
+            padding: 5px;
+            background: red;
+            color: #eee;
+            text-shadow: 0 1px #333;
+        }
         .jsbox-test li {
             margin-top: 2px;
             margin-bottom:2px;
@@ -49,10 +58,25 @@
         
     </head>
     <body>
-       
-
-        <div id="jsbox"></div>
-
+    
+        <div class="jsbox">
+            <code>a = true;b = 1;aaa</code>
+            <ul>
+                <li>a === true</li>
+                <li>typeof b === 'boolean'</li>
+            </ul>
+        </div>
+        
+        <hr>
+        
+        <div class="jsbox">
+            <code>var a = false;</code>
+            <ul>
+                <li>a === true</li>
+                <li>typeof a === 'boolean'</li>
+            </ul>
+        </div>
+        
         <hr>
 
         <div class="jsbox">
@@ -61,7 +85,7 @@ var a;
 setTimeout(function() {
     a = 'marco';
     done();
-}, 10);
+}, 1000);
 </code>
             <ul>
                 <li>a === 'marco'</li>
@@ -71,28 +95,28 @@ setTimeout(function() {
 
         <hr>
 
-        <div class="jsbox">
-            <code>var a = 'pippo';</code>
-            <ul>
-                <li>a === 'pluto'</li>
-            </ul>
-        </div>
+        
         
         <hr>
         
-        <button id="dispose">Dispose All</button>
+        <button id="enable">Enable JSBox</button>
+        <button id="disable">Disable JSBox</button>
        
         <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
         <script src="jquery.jsbox.js"></script>
         <script>
-            $('#jsbox').jsbox({
-                code: 'var a = true;',
-                tests: ['a === true']
-            });
+//            $('#jsbox').jsbox({
+//                code: 'aaa;',
+//                tests: ['a === true','a !== false']
+//            });
+//            
             $('.jsbox').jsbox();
             
-            $('#dispose').click(function() {
-                $('#jsbox, .jsbox').jsbox('dispose');
+            $('#enable').click(function() {
+                $('.jsbox').jsbox();
+            });
+            $('#disable').click(function() {
+                $('.jsbox').jsbox('dispose');
             });
         </script>
        
