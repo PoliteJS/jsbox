@@ -12,11 +12,9 @@
     <body>
     
         <div class="jsbox"  data-jsbox data-jsbox-next="#a">
-<code>console.log('foo', 123, true, [1, 2, 3], {a:1, b:'aa'}, function() {return 123;});
-console.warn(new Date());console.error('mona!!!');a=true;</code>
+            <code></code>
             <ul>
                 <li>a === true</li>
-                <li>typeof b === 'boolean'</li>
             </ul>
         </div>
         
@@ -25,24 +23,18 @@ console.warn(new Date());console.error('mona!!!');a=true;</code>
         <div id="a" data-jsbox data-jsbox-next="#b">
             <code>var a = false;</code>
             <ul>
-                <li>a === true</li>
-                <li>typeof a === 'boolean'</li>
+                <li>a.length === 5</li>
+                <li>typeof a === 'string'</li>
             </ul>
         </div>
         
         <hr>
 
         <div id="b" data-jsbox>
-            <code>var done = this.async();
-var a;
-setTimeout(function() {
-    a = 'marco';
-    done();
-}, 1000);
-</code>
+            <code>var a = 0;
+for () {}</code>
             <ul>
-                <li>a === 'marco'</li>
-                <li>b.length === 6</li>
+                <li>a === 10;</li>
             </ul>
         </div>
 

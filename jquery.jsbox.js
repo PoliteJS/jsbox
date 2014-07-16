@@ -234,13 +234,8 @@
                 var timer;
                 var delay = delay || 250;
 
-                this.$ui = $('<textarea class="jsbox-default-editor" wrap="off" placeholder="CMD+Return to execute, CMD+Backspace to reset">').on('keyup', function(e) {
-                    clearTimeout(timer);
-                    timer = setTimeout(function() {
-                        updateFn(self.getSource());
-                    }, delay);
-                }).appendTo($target);
-
+                this.$ui = $('<textarea class="jsbox-default-editor" wrap="off" placeholder="CMD+Return to execute, CMD+Backspace to reset">').appendTo($target);
+                
                 this.$ui.on('keydown', function(e) {
                     var keyCode = e.keyCode || e.which;
 
@@ -256,7 +251,7 @@
                             + $(this).val().substring(end));
 
                         // put caret at right position again
-                        $(this).get(0).selectionStart = $(this).get(0).selectionEnd = start + 1;
+                        $(this).get(0).selectionStart = $(this).get(0).selectionEnd = start + 2;
                     }
 
                     // cmd+Enter to trigger execute
@@ -281,6 +276,20 @@
                     }
 
                 });
+                
+                this.$ui.on('keyup', function(e) {
+                    clearTimeout(timer);
+                    timer = setTimeout(function() {
+                        updateFn(self.getSource());
+                    }, delay);
+                    
+                });
+                
+                // auto resize textarea
+                resizeTextArea(self.$ui);
+                this.$ui.on('keydown change', function(e) {
+                    resizeTextArea(self.$ui);
+                });
 
                 this.setSource(source);
             },
@@ -300,6 +309,12 @@
                 return this;
             }
         };
+        
+        function resizeTextArea($el) {
+            $el.stop().animate({
+                'height': ($el[0].scrollHeight + 15) + 'px'
+            }, 200);
+        }
         
         return editor;
     
