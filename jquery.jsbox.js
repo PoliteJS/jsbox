@@ -17,6 +17,7 @@
             this.el = el;
             this.$el = $(this.el);
             this.config = config;
+            this.status = false;
             
             this.source = '';
             loadSourceCode(this);
@@ -33,6 +34,15 @@
             disposeEditor(this);
             disposeSandbox(this);
         },
+        on: function(event, handler) {
+            subscribe(this, event, handler);
+        },
+        enable: function() {
+            this.$el.removeClass('jsbox-disabled');
+        },
+        disable: function() {
+            this.$el.addClass('jsbox-disabled');
+        },
         setSource: function(source) {
             this.source = source;
             this.editor.setSource(this.source);
@@ -42,7 +52,12 @@
             this.setSource(this._originalSource);
         },
         run: function() {
-            this.sandbox.reset().run(this.source, this.tests);
+            var self = this;
+            this.status = false;
+            this.sandbox.reset().run(this.source, this.tests, function(result) {
+                self.status = result;
+                publish(self, 'status', self.status);
+            });
         }
     };
     
@@ -184,7 +199,7 @@
         obj._subscriptions[event].push(cb);
     }
     
-    function trigger(obj, event) {
+    function publish(obj, event) {
         var args = Array.prototype.slice.call(arguments);
         args.shift();
         args.shift();
@@ -246,21 +261,21 @@
                     if (keyCode == 13 && e.ctrlKey || keyCode == 13 && e.metaKey) {
                         e.preventDefault();
                         e.stopPropagation();
-                        trigger(self, 'cmd-run');
+                        publish(self, 'cmd-run');
                     }
                     
                     // cmd+Est to trigger reset
                     if (keyCode == 27 && e.ctrlKey || keyCode == 27 && e.metaKey) {
                         e.preventDefault();
                         e.stopPropagation();
-                        trigger(self, 'cmd-reset');
+                        publish(self, 'cmd-reset');
                     }
                     
                     // cmd+Backspace to trigger reset
                     if (keyCode == 8 && e.ctrlKey || keyCode == 8 && e.metaKey) {
                         e.preventDefault();
                         e.stopPropagation();
-                        trigger(self, 'cmd-reset');
+                        publish(self, 'cmd-reset');
                     }
 
                 });
@@ -291,6 +306,14 @@
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
     // --------------------------------------------------- //
     // ---[   D E F A U L T   T E S T   R U N N E R   ]--- //
     // --------------------------------------------------- //
@@ -307,37 +330,37 @@
                 subscribe(this, e, cb);
             },
             reset: function() {
-                trigger(this, 'reset');
+                publish(this, 'reset');
                 return this;
             },
-            run: function(source, tests) {
+            run: function(source, tests, callback) {
                 var self = this;
                 
                 // test for syntax error in source code
                 try {
                     var fn = new Function(source);  
                 } catch(e) {
-                    trigger(this, 'exception', e);
-                    trigger(this, 'stop');
+                    publish(this, 'exception', e);
+                    publish(this, 'stop');
                     return;
                 }
                 
                 var publishEvent = function() {
                     var args = Array.prototype.slice.call(arguments);
                     args.unshift(self);
-                    trigger.apply(null, args);
+                    publish.apply(null, args);
                 };
                 
                 // execute source and tests
-                trigger(this, 'start');
+                publish(this, 'start');
                 execute(this.el, source, tests, publishEvent, function(test, index, result) {
-                    trigger(self, 'stop');
-                    trigger(self, result ? 'success' : 'failure', index, test);
-                });
+                    publish(self, 'stop');
+                    publish(self, result ? 'success' : 'failure', index, test);
+                }, callback);
             }
         };
         
-        function execute(target, source, tests, publishEvent, callback) {
+        function execute(target, source, tests, publishEvent, testCallback, sandboxCallback) {
             
             // one shot iframe where to run the code and tests
             var box = document.createElement('iframe');
@@ -375,13 +398,16 @@
             }
             
             function test() {
+                var _result = true;
                 tests.forEach(function(test, index) {
                     scope.sandboxTestResultsHandler = function(result) {
-                        callback.call(scope, test, index, result);
+                        testCallback.call(scope, test, index, result);
+                        _result = _result && result;
                     };
                     makeScriptEl('try {sandboxTestResultsHandler(' + test + ');} catch (e) {sandboxTestResultsHandler(false);}', body);
                 });
                 target.removeChild(box);
+                sandboxCallback(_result);
             }
             
             
@@ -442,26 +468,6 @@
     
     
     
-    // --------------------------------------------------------- //
-    // ---[   D E F A U L T   C O N S O L E   L O G G E R   ]--- //
-    // --------------------------------------------------------- //
-    
-    var defaultConsole = (function() {
-        
-        var console = {};
-        
-        
-        return console;
-    
-    })();
-    
-    
-    
-    
-    
-    
-    
-    
     
     // --------------------------------------------------- //
     // ---[   J Q U E R Y   P L U G I N   S E T U P   ]--- //
@@ -475,12 +481,36 @@
      */
     function init(config) {
         var $this = $(this);
-        if ($this.data('jsbox')) {
+        
+        // prevent multiple initialisation
+        if ($this.data('jsbox') && $this.data('jsbox') !== true) {
             return;
         }
+        
+        config = $.extend({}, config, {
+            next: $this.attr('data-jsbox-next') || ''
+        });
+        
         var instance = Object.create(JSBox);
         instance.init(this, config);
         $this.data('jsbox', instance);
+        
+        // lock next exercise
+        if (config.next) {
+            var next;
+            $(document).delegate(config.next, 'jsbox-ready', function(e, _next) {
+                next = _next;
+                next.disable();
+            });
+            instance.on('status', function(status) {
+                if (status && next) {
+                    next.enable();
+                }
+            });
+        }
+        
+        $this.trigger('jsbox-ready', instance);
+        
     }
     
     /**
@@ -539,5 +569,13 @@
         
         return this;
     };
+    
+    
+    /**
+     * Widgets auto setup
+     */
+    $(document).ready(function() {
+        $('[data-jsbox]').jsbox();
+    });
     
 })(jQuery);

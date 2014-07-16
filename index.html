@@ -7,6 +7,10 @@
         <title>JSBox - run live JS Exercises!</title>
         
         <style>
+        .jsbox-disabled {
+            background: red;
+        }
+        
         .jsbox-test {
             margin:0 0 5px 0;
             padding:0;
@@ -180,7 +184,7 @@
     </head>
     <body>
     
-        <div class="jsbox">
+        <div class="jsbox"  data-jsbox data-jsbox-next="#a">
 <code>console.log('foo', 123, true, [1, 2, 3], {a:1, b:'aa'}, function() {return 123;});
 console.warn(new Date());console.error('mona!!!');a=true;</code>
             <ul>
@@ -191,7 +195,7 @@ console.warn(new Date());console.error('mona!!!');a=true;</code>
         
         <hr>
         
-        <div class="jsbox">
+        <div id="a" data-jsbox data-jsbox-next="#b">
             <code>var a = false;</code>
             <ul>
                 <li>a === true</li>
@@ -201,7 +205,7 @@ console.warn(new Date());console.error('mona!!!');a=true;</code>
         
         <hr>
 
-        <div class="jsbox">
+        <div id="b" data-jsbox>
             <code>var done = this.async();
 var a;
 setTimeout(function() {
@@ -232,7 +236,7 @@ setTimeout(function() {
 //                tests: ['a === true','a !== false']
 //            });
 //            
-            $('.jsbox').jsbox();
+            //$('.jsbox').jsbox();
             
             $('#enable').click(function() {
                 $('.jsbox').jsbox();
