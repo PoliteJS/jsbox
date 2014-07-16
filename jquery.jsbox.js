@@ -84,7 +84,7 @@
     // DOM
     function initDOM(box) {
         box._originalHTML = box.$el.html();
-        box.$el.empty();
+        box.$el.empty().addClass('jsbox-widget');
         
         box.$editor = $('<div class="jsbox-editor">');
         
@@ -103,6 +103,10 @@
         box.$runBtn.on('click', box.run.bind(box));
         box.$resetBtn.on('click', box.reset.bind(box));
         
+        box.$overlay = $('<div class="jsbox-overlay">');
+        box.$overlay.append('<p>solve the previous exercise to unlock!</p>');
+        
+        // place items into a template???
         box.$el
             .append(box.$tests)
             .append(box.$editor)
@@ -110,19 +114,17 @@
             .append(box.$exception)
             .append(box.$console)
             .append(box.$runBtn)
-            .append(box.$resetBtn);
+            .append(box.$resetBtn)
+            .append(box.$overlay);
     }
     
     function disposeDOM(box) {
-        box.$editor.remove();
-        box.$console.remove();
-        box.$tests.remove();
-        box.$sandbox.remove();
-        box.$exception.remove();
-        box.$console.remove();
-        box.$runBtn.off().remove();
-        box.$resetBtn.off().remove();
-        box.$el.html(box._originalHTML);
+        box.$runBtn.off();
+        box.$resetBtn.off();
+        box.$el
+            .empty()
+            .removeClass('jsbox-widget')
+            .html(box._originalHTML);
     }
     
     // EDITOR
