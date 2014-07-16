@@ -115,6 +115,8 @@
         var editor = box.config.editor || defaultEditor;
         box.editor = Object.create(editor);
         box.editor.init(box.$editor, box.setSource.bind(box), box.source, box.config.updateDelay);
+        box.editor.on('cmd-run', box.run.bind(box));
+        box.editor.on('cmd-reset', box.reset.bind(box));
     }
     
     function disposeEditor(box) {
@@ -165,6 +167,39 @@
     
     
     
+    
+    
+    
+    // ----------------------------------------------- //
+    // ---[   P U B / S U B   U T I L I T I E S   ]--- //
+    // ----------------------------------------------- //
+    
+    function subscribe(obj, event, cb) {
+        if (!obj._subscriptions) {
+            obj._subscriptions = {};
+        }
+        if (!obj._subscriptions[event]) {
+            obj._subscriptions[event] = [];
+        }
+        obj._subscriptions[event].push(cb);
+    }
+    
+    function trigger(obj, event) {
+        var args = Array.prototype.slice.call(arguments);
+        args.shift();
+        args.shift();
+        if (obj._subscriptions && obj._subscriptions[event]) {
+            obj._subscriptions[event].forEach(function(cb) {
+                cb.apply(obj, args);
+            });
+        }
+    }
+    
+    
+    
+    
+    
+    
     // --------------------------------------------------------- //
     // ---[   D E F A U L T   E D I T O R   A D A P T E R   ]--- //
     // --------------------------------------------------------- //
@@ -174,61 +209,84 @@
      * with the current code.
      */
     
-    var defaultEditor = {
-        init: function($target, updateFn, source, delay) {
-            var self = this;
-            var timer;
-            var delay = delay || 250;
-            
-            this.$ui = $('<textarea class="jsbox-default-editor" wrap="off">').on('keyup', function(e) {
-                clearTimeout(timer);
-                timer = setTimeout(function() {
-                    updateFn(self.getSource());
-                }, delay);
-            }).appendTo($target);
-            
-            this.$ui.on('keydown', function(e) {
-                var keyCode = e.keyCode || e.which;
-                
-                // handle tab to indent
-                if (keyCode == 9) {
-                    e.preventDefault();
-                    var start = $(this).get(0).selectionStart;
-                    var end = $(this).get(0).selectionEnd;
+    var defaultEditor = (function() {
+        
+        var editor = {
+            init: function($target, updateFn, source, delay) {
+                var self = this;
+                var timer;
+                var delay = delay || 250;
 
-                    // set textarea value to: text before caret + tab + text after caret
-                    $(this).val($(this).val().substring(0, start)
-                        + "  "
-                        + $(this).val().substring(end));
+                this.$ui = $('<textarea class="jsbox-default-editor" wrap="off" placeholder="CMD+Return to execute, CMD+Backspace to reset">').on('keyup', function(e) {
+                    clearTimeout(timer);
+                    timer = setTimeout(function() {
+                        updateFn(self.getSource());
+                    }, delay);
+                }).appendTo($target);
 
-                    // put caret at right position again
-                    $(this).get(0).selectionStart = $(this).get(0).selectionEnd = start + 1;
-                }
-                
-                // cmd+Enter to trigger exevute
-                if (keyCode == 13 && e.ctrlKey || keyCode == 13 && e.metaKey) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    alert("execute");
-                }
-                
-            });
-            
-            this.setSource(source);
-        },
-        dispose: function() {
-            this.$ui.off().remove();
-            this.$ui = null;
-        },
-        getSource: function() {
-            return this.$ui.val();
-        },
-        // must not trigger the updateFn!
-        setSource: function(source) {
-            this.$ui.val(source);
-            return this;
-        }
-    };
+                this.$ui.on('keydown', function(e) {
+                    var keyCode = e.keyCode || e.which;
+
+                    // handle tab to indent
+                    if (keyCode == 9) {
+                        e.preventDefault();
+                        var start = $(this).get(0).selectionStart;
+                        var end = $(this).get(0).selectionEnd;
+
+                        // set textarea value to: text before caret + tab + text after caret
+                        $(this).val($(this).val().substring(0, start)
+                            + "  "
+                            + $(this).val().substring(end));
+
+                        // put caret at right position again
+                        $(this).get(0).selectionStart = $(this).get(0).selectionEnd = start + 1;
+                    }
+
+                    // cmd+Enter to trigger execute
+                    if (keyCode == 13 && e.ctrlKey || keyCode == 13 && e.metaKey) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        trigger(self, 'cmd-run');
+                    }
+                    
+                    // cmd+Est to trigger reset
+                    if (keyCode == 27 && e.ctrlKey || keyCode == 27 && e.metaKey) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        trigger(self, 'cmd-reset');
+                    }
+                    
+                    // cmd+Backspace to trigger reset
+                    if (keyCode == 8 && e.ctrlKey || keyCode == 8 && e.metaKey) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        trigger(self, 'cmd-reset');
+                    }
+
+                });
+
+                this.setSource(source);
+            },
+            on: function(e, cb) {
+                subscribe(this, e, cb);
+            },
+            dispose: function() {
+                this.$ui.off().remove();
+                this.$ui = null;
+            },
+            getSource: function() {
+                return this.$ui.val();
+            },
+            // must not trigger the updateFn!
+            setSource: function(source) {   
+                this.$ui.val(source);
+                return this;
+            }
+        };
+        
+        return editor;
+    
+    })();
     
     
     
@@ -242,20 +300,11 @@
         var sandbox = {
             init: function(el) {
                 this.el = el;
-                this._subs = {
-                    start: [],
-                    stop: [],
-                    success: [],
-                    failure: [],
-                    exception: [],
-                    console: [],
-                    reset: []
-                };
                 _sandbox = this;
             },
             dispose: function() {},
-            on: function(evt, cb) {
-                this._subs[evt].push(cb);
+            on: function(e, cb) {
+                subscribe(this, e, cb);
             },
             reset: function() {
                 trigger(this, 'reset');
@@ -287,15 +336,6 @@
                 });
             }
         };
-        
-        function trigger(runner, event) {
-            var args = Array.prototype.slice.call(arguments);
-            args.shift();
-            args.shift();
-            runner._subs[event].forEach(function(cb) {
-                cb.apply(null, args);
-            });
-        }
         
         function execute(target, source, tests, publishEvent, callback) {
             
