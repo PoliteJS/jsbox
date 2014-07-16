@@ -180,12 +180,39 @@
             var timer;
             var delay = delay || 250;
             
-            this.$ui = $('<textarea class="jsbox-default-editor">').on('keyup', function(e) {
+            this.$ui = $('<textarea class="jsbox-default-editor" wrap="off">').on('keyup', function(e) {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
                     updateFn(self.getSource());
                 }, delay);
             }).appendTo($target);
+            
+            this.$ui.on('keydown', function(e) {
+                var keyCode = e.keyCode || e.which;
+                
+                // handle tab to indent
+                if (keyCode == 9) {
+                    e.preventDefault();
+                    var start = $(this).get(0).selectionStart;
+                    var end = $(this).get(0).selectionEnd;
+
+                    // set textarea value to: text before caret + tab + text after caret
+                    $(this).val($(this).val().substring(0, start)
+                        + "  "
+                        + $(this).val().substring(end));
+
+                    // put caret at right position again
+                    $(this).get(0).selectionStart = $(this).get(0).selectionEnd = start + 1;
+                }
+                
+                // cmd+Enter to trigger exevute
+                if (keyCode == 13 && e.ctrlKey || keyCode == 13 && e.metaKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    alert("execute");
+                }
+                
+            });
             
             this.setSource(source);
         },
@@ -243,6 +270,7 @@
                 } catch(e) {
                     trigger(this, 'exception', e);
                     trigger(this, 'stop');
+                    return;
                 }
                 
                 var publishEvent = function() {

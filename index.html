@@ -7,68 +7,173 @@
         <title>JSBox - run live JS Exercises!</title>
         
         <style>
+        .jsbox-test {
+            margin:0 0 5px 0;
+            padding:0;
+            list-style: none;
+            border: 1px solid #888;
+            border-radius: 3px;
+            overflow: hidden;
+            
+            font-family: monospace;
+            font-size: 11pt;
+            text-shadow: 0 1px #fff;
+        }
+        .jsbox-test li {
+            position: relative;
+            display: block;
+            padding:5px;
+            border-top: 1px solid #fff;
+            border-bottom: 1px solid #888;
+            background: #eee;
+            color: 333;
+            -webkit-transition: all .2s ease-in-out;
+        }
+        .jsbox-test li:first-child {
+            border-top: none;
+        }
+        .jsbox-test li:last-child {
+            border-bottom: none;
+        }
+        .jsbox-test.running li {
+            padding-left: 70px;
+            font-style: italic;
+        }
+        .jsbox-test.running li:before {
+            position: absolute;
+            top:50%;
+            left: 5px;
+            margin-top:-8px;
+            content: 'running...';
+            display: inline-block;
+            width: 60px;
+            height: 15px;
+            border-radius: 10px;
+            
+            text-align: center;
+            line-height: 13px;
+            text-shadow: none;
+            
+            font-family: sans-serif;
+            font-size: 8pt;
+            background: #f0f018;
+            color: #666;
+        }
+        .jsbox-test li.success {
+            color: green;
+            padding-left: 30px;
+        }
+        .jsbox-test li.success:before {
+            position: absolute;
+            top:50%;
+            left: 5px;
+            margin-top:-8px;
+            content: 'ok';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 10px;
+            
+            text-align: center;
+            line-height: 13px;
+            text-shadow: none;
+            
+            font-family: sans-serif;
+            font-size: 8pt;
+            background: green;
+            color: #fff;
+        }
+        .jsbox-test li.failure {
+            color: #9d2222;
+            padding-left: 30px;
+        }
+        .jsbox-test li.failure:before {
+            position: absolute;
+            top:50%;
+            left: 5px;
+            margin-top:-8px;
+            content: '_';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 10px;
+            
+            text-align: center;
+            line-height: 3px;
+            
+            font-family: sans-serif;
+            font-size: 11pt;
+            background: #9d2222;
+            color: #fff;
+        }
+        
+        .jsbox-editor {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            height: 120px;
+            margin: 0 0 5px 0;
+            padding: 8px;
+            padding-right: 16px;
+            overflow: hidden;
+            background: #666;
+            border-radius: 3px;
+        }
         .jsbox-default-editor {
             display: block;
-            width: 450px;
-            height: 120px;
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline-width: 0;
+            resize:none;
             background: #666;
             color: #fafafa;
-            text-shadow: 0 1px #000;
-            border: none;
-            border-radius: 5px;
-            padding:5px;
-            font-size: 12pt;
             font-family: monospace;
+            font-size: 11pt;
+            text-shadow: 0 1px #000;
+            line-height: 1.5em;
         }
+        
         .jsbox-sandbox {
             display: none;
         }
+        
         .jsbox-exception {
-            padding: 5px;
-            background: red;
-            color: #eee;
-            text-shadow: 0 1px #333;
-        }
-        .jsbox-test {
-            margin:0;
-            padding:0;
-            list-style: none;
-        }
-        .jsbox-test.running li {
-            background: rgba(63, 141, 208, 0.62);
-        }
-        .jsbox-test li {
-            margin-top: 2px;
-            margin-bottom:2px;
-            display: block;
-            width: 450px;
-            border: 1px solid #666;
-            border-radius: 5px;
+            margin:0 0 5px 0;
             padding:5px;
-            font-size: 12pt;
-            background: #ddd;
-            color: 333;
-            text-shadow: 0 1px #fff;
-            font-family: monospace;
-        }
-        .jsbox-test li.success {
-            background: rgba(0, 128, 0, 0.29);
-        }
-        .jsbox-test li.failure {
-            background: rgba(128, 0, 0, 0.29);
-        }
-        .jsbox-console {
-            margin:0;
-            padding:0;
+            list-style: none;
             font-family: monospace;
             font-size: 9pt;
+            border-left: 3px solid #9d2222;
+            color: #9d2222;
+        }
+        
+        .jsbox-console {
+            margin:0 0 5px 0;
+            padding:5px;
+            list-style: none;
+            font-family: monospace;
+            font-size: 9pt;
+            border-left: 3px solid #888;
         }
         
         .jsbox-console li:before {
-            content: '> ';
+            content: '';
         }
         .jsbox-console li {
             margin: 2px;
+        }
+        .jsbox-console li.warn {
+            color: #baa500;
+        }
+        .jsbox-console li.warn:before {
+            content: '@ ';
+        }
+        .jsbox-console li.error {
+            color: #9d2222;
+        }
+        .jsbox-console li.error:before {
+            content: '! ';
         }
         </style>
         
@@ -77,7 +182,7 @@
     
         <div class="jsbox">
 <code>console.log('foo', 123, true, [1, 2, 3], {a:1, b:'aa'}, function() {return 123;});
-console.log(new Date());</code>
+console.warn(new Date());console.error('mona!!!');a=true;</code>
             <ul>
                 <li>a === true</li>
                 <li>typeof b === 'boolean'</li>
