@@ -1,29 +1,98 @@
 <!doctype html>
-<html lang="en-US">
-    <head>
-        <meta charset="utf-8">
-    	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<html>
 
-        <title>JSBox - run live JS Exercises!</title>
-        
-        <!-- jQuery -->
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        
-        <!-- JSBox -->
-        <link rel="stylesheet" href="jsbox/jquery.jsbox.min.css">
-        <script src="jsbox/jquery.jsbox.min.js"></script>
-        
-    </head>
-    <body>
-        
-        <h1>JSBox</h1>
-        
-        <div data-jsbox>
-            <code>var a = true;  /* press "run" to test this code! */</code>
-            <ul>
-                <li>a === true</li>
-            </ul>
-        </div>
-        
-    </body>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <title>JSBox - run live JS Exercises!</title>
+
+    <link rel="stylesheet" href="assets/stylesheets/styles.css">
+    <link rel="stylesheet" href="assets/stylesheets/page-style.css">
+
+    <!--  Icons -->
+    <link rel="icon" type="image/png" href="assets/images/icons/polite.jpg" sizes="16x16">
+    <link rel="icon" type="image/png" href="assets/images/icons/polite.jpg" sizes="32x32">
+    <!-- // Icon -->
+    
+    
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- jQuery -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <!-- JSBox -->
+    <link rel="stylesheet" href="jsbox/jquery.jsbox.min.css">
+    <script src="jsbox/jquery.jsbox.min.js"></script>
+    
+    <!-- Social -->
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53bbbbe907e85e8c"></script>
+    <!-- // Social -->
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <header>
+            <div id="header-block" class="clearfix">
+                <img id="logo" class="left" alt="PoliteJS Logo" width="75" src="assets/images/polite.jpg" />
+                <div id="title-block" class="left">
+                    <h1>PoliteJS.com</h1>
+                    <p>that's web stuff</p>
+                </div>
+            </div>
+
+            <div class="author-block">
+                <h3>Marco Pegoraro</h3>
+                <ul class="clearfix">
+                    <li>
+                        <img src="assets/images/marco-pegoraro.jpg" alt="Marco Pegoraro" width="80" class="frame left" />
+                        <p>
+                            <b>I'm a web engineer.</b>
+                            <br>I play with Javascript, HTML5, mobile web apps, NodeJS.
+                        </p>
+                        <ul style="clear:both;margin-top: 20px;">
+                            <li><a href="http://twitter.com/thepeg" target="_blank">@ThePeg</a></li>
+                            <li><a href="http://noblackmagic.com" target="_blank">NoBlackMagic.com</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Start Sharing Social Icon Box -->
+            <div class="addthis_sharing_toolbox" style="margin-left:70px"></div>
+            <!-- // Sharing Social Icon Box -->
+        </header>
+
+        <article>
+
+            <section class="start-block-article">
+                <h2>JSBox <small>jQuery Plugin</small></h2>
+                <p>
+                    <b>JSBox</b> is an easy to use <i>jQuery</i> plugin you can use
+                    to <em>embed a Javascript sandbox</em> in any web page.
+                </p>
+            </section>
+
+            <section>
+                <div class="jsbox" data-jsbox>
+                    <code>var a = true;  /* press "run" to test this code! */</code>
+                    <ul>
+                        <li>a === true</li>
+                    </ul>
+                </div>
+            </section>
+
+        </article>
+
+
+    </div>
+
+</body>
+
 </html>
