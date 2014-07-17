@@ -6,7 +6,16 @@
  */
 
 module.exports = function (grunt) {
-
+    
+    
+    var jsModules = [
+        'src/js/pubsub.js',
+        'src/js/editor.js',
+        'src/js/sandbox.js',
+        'src/js/jsbox.js',
+        'src/js/plugin.js'
+    ];
+    
     
 // --------------------------------------- //
 // ---[[   G R U N T   C O N F I G   ]]--- //
@@ -33,13 +42,29 @@ module.exports = function (grunt) {
                     sourceMapFilename: 'jquery.jsbox.js.map'
                 },
                 files: {
-                    'build/jquery.jsbox.js' : [
-                        'src/js/pubsub.js',
-                        'src/js/editor.js',
-                        'src/js/sandbox.js',
-                        'src/js/jsbox.js',
-                        'src/js/plugin.js'
-                    ]
+                    'build/jquery.jsbox.js' : jsModules
+                }
+            },
+            release: {
+                options: {
+                    mangle: false,
+                    compress: false,
+                    beautify: true,
+                    preserveComments: true,
+                    banner: '(function($) {\n\n',
+                    footer: '\n\n})(jQuery);'
+                },
+                files: {
+                    'build/jquery.jsbox.js' : jsModules
+                }
+            },
+            'release-min': {
+                options: {
+                    banner: '(function($) {',
+                    footer: '})(jQuery);'
+                },
+                files: {
+                    'build/jquery.jsbox.min.js' : jsModules
                 }
             }
         },
@@ -53,6 +78,23 @@ module.exports = function (grunt) {
                 },
                 files: {
                     'build/jquery.jsbox.css' : 'src/less/jsbox.less'
+                }
+            },
+            release: {
+                options: {
+                    
+                },
+                files: {
+                    'build/jquery.jsbox.css' : 'src/less/jsbox.less'
+                }
+            },
+            'release-min': {
+                options: {
+                    compress: true,
+                    cleancss: true
+                },
+                files: {
+                    'build/jquery.jsbox.min.css' : 'src/less/jsbox.less'
                 }
             }
         },
@@ -78,6 +120,14 @@ module.exports = function (grunt) {
         'clean:build',
         'uglify:build',
         'less:build'
+    ]);
+    
+    grunt.registerTask('release', [
+        'clean:build',
+        'uglify:release',
+        'uglify:release-min',
+        'less:release',
+        'less:release-min'
     ]);
         
     grunt.registerTask('develop', [
