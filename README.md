@@ -3,6 +3,15 @@ JSBox
 
 this jQuery plugin allow to create a Javascript exercise box within an HTML web page.
 
+## How to Build
+
+In order to build the jQuery plugin you need _NodeJS_ installed on your machine and
+the task runner _GruntJS_.
+
+Then you can run:
+
+    npm install && grunt
+
 ## How To Use
     
     <!-- put this into the page BODY -->
