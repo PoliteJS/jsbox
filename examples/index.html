@@ -15,9 +15,44 @@
         
     </head>
     <body>
-    
+        
+        <h1>JSBox Examples</h1>
+        
+        <div style="border: 2px solid brown; margin-bottom: 20px;padding:0 20px 20px 20px;">
+            <p>
+                <b>IMPORTANT!</b><br>
+                All the exercises use the <em>JSBox developement build</em> which is not provided within the GitHub repository.
+            </p>
+            <p>
+                You need to build by running a simple instruction in your terminal:
+            </p>
+            <pre style="background:#eee;padding: 10px;font-size: 14pt;">npm install && grunt</pre>
+            <p>
+                &gt; You need <em>NodeJS</em> and <em>GruntJS</em> to be installed on your computer!
+            </p>
+        </div>
+        
+        <h2>Available Examples</h2>
+        
+        <ul>
+            <li><a href="concat.html">Concatenated Exercises</a></li>
+            <li><a href="playground.html">JS Playground</a></li>
+        </ul>
+        
+        <hr>
+        
+        <h2>Your First Exercise</h2>
+        
+        <p>
+            Try to write the necessary <em>Javascript Code</em> in order to make the test pass!
+        </p>
+        
+        <p>
+            When you feel ready just press the "run" button or type "Cmd + Return"!
+        </p>
+        
         <div class="jsbox"  data-jsbox data-jsbox-next="#a">
-            <code></code>
+            <code>var a = </code>
             <ul>
                 <li>a === true</li>
             </ul>
@@ -25,43 +60,32 @@
         
         <hr>
         
-        <div id="a" data-jsbox data-jsbox-next="#b">
-            <code>var a = false;</code>
-            <ul>
-                <li>a.length === 5</li>
-                <li>typeof a === 'string'</li>
-            </ul>
-        </div>
+        <h2>Enable / Disable</h2>
         
-        <hr>
-
-        <div id="b" data-jsbox>
-            <code>var a = 0;
-for () {}</code>
-            <ul>
-                <li>a === 10;</li>
-            </ul>
-        </div>
-
-        <hr>
-
-        
-        
-        <hr>
+        <p>
+            These buttons are here to test a manual enable / disable action. <br>
+            When you disable JSBox your <em>DOM Element</em> is restored to it's original state!
+        </p>
         
         <button id="enable">Enable JSBox</button>
         <button id="disable">Disable JSBox</button>
        
-        
         <script>
-            
-//            $('#enable').click(function() {
-//                $('[data-jsbox]').jsbox();
-//            });
-//            $('#disable').click(function() {
-//                $('[data-jsbox]').jsbox('dispose');
-//            });
+        $('#enable').click(function() {
+            $('[data-jsbox]').jsbox();
+        });
+        $('#disable').click(function() {
+            $('[data-jsbox]').jsbox('dispose');
+        });
         </script>
+        
+        <hr>
+        
+        <h2>More Info Online!</h2>
+        
+        <p>
+            <a href="http://politejs.com/jsbox">http://PoliteJS/jsbox</a>
+        </p>
        
     </body>
 </html>

@@ -13,9 +13,12 @@ module.exports = function (grunt) {
         'src/js/editor.js',
         'src/js/sandbox.js',
         'src/js/jsbox.js',
-        'src/js/plugin.js'
+        'src/js/plugin.js',
     ];
     
+    var jsWrapperStart = grunt.file.read('src/js/wrapper-start.js');
+    var jsWrapperEnd = grunt.file.read('src/js/wrapper-end.js');
+        
     
 // --------------------------------------- //
 // ---[[   G R U N T   C O N F I G   ]]--- //
@@ -26,7 +29,8 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
         
         clean: {
-			build: ['build']
+			build: ['build'],
+            release: ['release']
 		},
         
         uglify: {
@@ -36,8 +40,8 @@ module.exports = function (grunt) {
                     compress: false,
                     beautify: true,
                     preserveComments: true,
-                    banner: '(function($) {\n\n',
-                    footer: '\n\n})(jQuery);',
+                    banner: jsWrapperStart,
+                    footer: jsWrapperEnd,
                     sourceMap: true,
                     sourceMapFilename: 'jquery.jsbox.js.map'
                 },
@@ -51,20 +55,20 @@ module.exports = function (grunt) {
                     compress: false,
                     beautify: true,
                     preserveComments: true,
-                    banner: '(function($) {\n\n',
-                    footer: '\n\n})(jQuery);'
+                    banner: jsWrapperStart,
+                    footer: jsWrapperEnd
                 },
                 files: {
-                    'build/jquery.jsbox.js' : jsModules
+                    'release/jquery.jsbox-<%= pkg.version %>.js' : jsModules
                 }
             },
             'release-min': {
                 options: {
-                    banner: '(function($) {',
-                    footer: '})(jQuery);'
+                    banner: jsWrapperStart,
+                    footer: jsWrapperEnd
                 },
                 files: {
-                    'build/jquery.jsbox.min.js' : jsModules
+                    'release/jquery.jsbox-<%= pkg.version %>.min.js' : jsModules
                 }
             }
         },
@@ -81,11 +85,8 @@ module.exports = function (grunt) {
                 }
             },
             release: {
-                options: {
-                    
-                },
                 files: {
-                    'build/jquery.jsbox.css' : 'src/less/jsbox.less'
+                    'release/jquery.jsbox-<%= pkg.version %>.css' : 'src/less/jsbox.less'
                 }
             },
             'release-min': {
@@ -94,11 +95,36 @@ module.exports = function (grunt) {
                     cleancss: true
                 },
                 files: {
-                    'build/jquery.jsbox.min.css' : 'src/less/jsbox.less'
+                    'release/jquery.jsbox-<%= pkg.version %>.min.css' : 'src/less/jsbox.less'
                 }
             }
         },
         
+        usebanner: {
+            build: {
+                options: {
+                    position: 'top',
+                    banner: '/* JSBox v<%= pkg.version %> - DEVELOPEMENT VERSION | by Marco Pegoraro | http://politejs.com/jsbox */'
+                },
+                files: {
+                    src: [
+                        'build/*.js', 'build/*.css'
+                    ]
+                }
+            },
+            release: {
+                options: {
+                    position: 'top',
+                    banner: '/* JSBox v<%= pkg.version %> | by Marco Pegoraro |http://politejs.com/jsbox */'
+                },
+                files: {
+                    src: [
+                        'release/*.js', 'release/*.css'
+                    ]
+                }
+            }
+        },
+            
         watch: {
             build: {
                 files: ['src/**/*'],
@@ -119,15 +145,17 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'clean:build',
         'uglify:build',
-        'less:build'
+        'less:build',
+        'usebanner:build'
     ]);
     
     grunt.registerTask('release', [
-        'clean:build',
+        'clean:release',
         'uglify:release',
         'uglify:release-min',
         'less:release',
-        'less:release-min'
+        'less:release-min',
+        'usebanner:release'
     ]);
         
     grunt.registerTask('develop', [
@@ -151,6 +179,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-banner');
     
 
     
