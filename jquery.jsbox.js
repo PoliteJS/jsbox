@@ -287,8 +287,12 @@
                 
                 // auto resize textarea
                 resizeTextArea(self.$ui);
+                var t;
                 this.$ui.on('keydown change', function(e) {
-                    resizeTextArea(self.$ui);
+                    clearTimeout(t);
+                    t = setTimeout(function() {
+                        resizeTextArea(self.$ui);
+                    }, 500);
                 });
 
                 this.setSource(source);
@@ -311,9 +315,11 @@
         };
         
         function resizeTextArea($el) {
-            $el.stop().animate({
-                'height': ($el[0].scrollHeight + 15) + 'px'
-            }, 200);
+            $el.css('height', 'auto');
+            $el.css('height', ($el[0].scrollHeight + 15) + 'px');
+//            $el.stop().animate({
+//                'height': ($el[0].scrollHeight + 15) + 'px'
+//            }, 200);
         }
         
         return editor;
