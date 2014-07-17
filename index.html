@@ -53,7 +53,7 @@
                     <li>
                         <img src="assets/images/marco-pegoraro.jpg" alt="Marco Pegoraro" width="80" class="frame left" />
                         <p>
-                            <b>I'm a web engineer.</b>
+                            <b>I'm a Front End Dev</b>
                             <br>I play with Javascript, HTML5, mobile web apps, NodeJS.
                         </p>
                         <ul style="clear:both;margin-top: 20px;">
@@ -63,7 +63,18 @@
                     </li>
                 </ul>
             </div>
-
+            
+            <hr>
+            
+            <h3>Get your JSBox!</h3>
+            
+            <ul>
+                <li>- <a href="https://github.com/PoliteJS/jsbox/releases/tag/v2.0.0">Download JSBox v2.0.0</a></li>
+                <li>- <a href="https://github.com/PoliteJS/jsbox">Fork on GitHub</a></li>
+            </ul>
+            
+            <hr>
+            
             <!-- Start Sharing Social Icon Box -->
             <div class="addthis_sharing_toolbox" style="margin-left:70px"></div>
             <!-- // Sharing Social Icon Box -->
@@ -74,18 +85,41 @@
             <section class="start-block-article">
                 <h2>JSBox <small>jQuery Plugin</small></h2>
                 <p>
-                    <b>JSBox</b> is an easy to use <i>jQuery</i> plugin you can use
-                    to <em>embed a Javascript sandbox</em> in any web page.
+                    <b>JSBox</b> is an easy to use <i>jQuery</i> plugin you can use to <br>
+                    <strong>embed a Javascript sandbox</strong> in any web page.
                 </p>
             </section>
-
+            
             <section>
-                <div class="jsbox" data-jsbox>
-                    <code>var a = true;  /* press "run" to test this code! */</code>
+                <h2>
+                    <span>This is your</span> first JSBox <span>exercise!</span>
+                </h2>
+                <p>
+                    <small>
+                    you need to <strong>type the Javascript code</strong> which is needed in order to fullfill the 
+                    list of conditions exposed in the top section of the box.
+                    </small>
+                </p>
+               
+                <div id="box1" data-jsbox>
+<code>var a = 'true';
+/* press "run" to test this code! */</code>
                     <ul>
+                        <li>typeof a !== 'undefined'</li>
                         <li>a === true</li>
                     </ul>
                 </div>
+                
+                <script>
+                $(document).ready(function() {
+                    $('#box1').jsbox('instance').on('status', function(status) {
+                        if (status) {
+                            alert('you just solved your first JSBox!');
+                        }
+                    });
+                });
+                </script>
+                
             </section>
 
         </article>
