@@ -6,7 +6,12 @@
 
         <title>JSBox - run live JS Exercises!</title>
         
-        <link rel="stylesheet" href="jquery.jsbox.css">
+        <!-- jQuery -->
+        <script src="../lib/jquery-2.1.1.min.js"></script>
+        
+        <!-- JSBox -->
+        <link rel="stylesheet" href="../build/jquery.jsbox.css">
+        <script src="../build/jquery.jsbox.js"></script>
         
     </head>
     <body>
@@ -47,16 +52,15 @@ for () {}</code>
         <button id="enable">Enable JSBox</button>
         <button id="disable">Disable JSBox</button>
        
-        <script src="jquery-2.1.1.min.js"></script>
-        <script src="jquery.jsbox.js"></script>
+        
         <script>
             
-            $('#enable').click(function() {
-                $('[data-jsbox]').jsbox();
-            });
-            $('#disable').click(function() {
-                $('[data-jsbox]').jsbox('dispose');
-            });
+//            $('#enable').click(function() {
+//                $('[data-jsbox]').jsbox();
+//            });
+//            $('#disable').click(function() {
+//                $('[data-jsbox]').jsbox('dispose');
+//            });
         </script>
        
     </body>

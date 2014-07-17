@@ -1,0 +1,39 @@
+{
+  "name": "jsbox",
+  "version": "2.0.0",
+  "description": "jquery playground plugin for javascript",
+  "main": "Gruntfile.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thepeg/jsbox.git"
+  },
+  "keywords": [
+    "jquery",
+    "plugin",
+    "javascript",
+    "sandbox",
+    "learn",
+    "exercise"
+  ],
+  "author": "Marco Pegoraro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thepeg/jsbox/issues"
+  },
+  "homepage": "https://github.com/thepeg/jsbox",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-less": "^0.11.3",
+    "grunt-contrib-uglify": "^0.5.0",
+    "grunt-contrib-cssmin": "^0.10.0",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
