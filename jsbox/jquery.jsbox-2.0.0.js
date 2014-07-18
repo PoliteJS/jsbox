@@ -1,6 +1,7 @@
-(function($) {
+/* JSBox v2.0.0 | by Marco Pegoraro |http://politejs.com/jsbox */
 
-function subscribe(obj, event, cb) {
+(function($) {
+    function subscribe(obj, event, cb) {
     if (!obj._subscriptions) {
         obj._subscriptions = {};
     }
@@ -462,5 +463,4 @@ $.fn.jsbox = function() {
 $(document).ready(function() {
     $("[data-jsbox]").jsbox();
 });
-
 })(jQuery);
