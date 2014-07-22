@@ -54,11 +54,13 @@ var templateEngine = {
     
     
     function renderSimple(target, data) {
-        target.classList.add('jsbox-template-simple');
+        target.classList.add('jsbox-tpl-simple');
         var keys = Object.keys(data);
-        ['html','css','js','sandbox'].forEach(function(key) {
+        ['html','css','js','sandbox','logger'].forEach(function(key) {
             if (keys.indexOf(key) !== -1) {
-                dom.append(data[key], target);
+                var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);
+                dom.append(data[key], wrapper);
+                dom.append(wrapper, target);
             }
         });
     }

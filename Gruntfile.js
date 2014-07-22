@@ -14,6 +14,7 @@ module.exports = function (grunt) {
         'src/js/utils/dom.js',
         'src/js/text-editor.js',
         'src/js/sandbox.js',
+        'src/js/logger.js',
         'src/js/template.js',
         'src/js/jsbox.js',
         'src/js/plugin.js'

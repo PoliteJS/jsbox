@@ -21,6 +21,7 @@ var JSBoxDefaults = {
     engines: {
         editor: textEditorEngine,
         sandbox: sandboxEngine,
+        logger: loggerEngine,
         template: templateEngine
     }
     
@@ -38,6 +39,8 @@ var JSBox = {
         
         initSandbox(this);
         
+        initLogger(this);
+        
         initTemplate(this);
         
         if (this.options.disabled === true) {
@@ -49,6 +52,7 @@ var JSBox = {
     dispose: function() {
         disposeEditors(this);
         disposeSandbox(this);
+        disposeLogger(this);
         disposePubSub(this);
         disposeTemplate(this);
         disposeDOM(this);
@@ -173,6 +177,26 @@ function disposeSandbox(box) {
 
 
 
+// ----------------------------------- //
+// ---[   I N I T   L O G G E R   ]--- //
+// ----------------------------------- //
+
+function initLogger(box) {
+    box.logger = box.options.engines.logger.create();
+    
+    box.logger.push('log', 'it is just a log');
+    box.logger.push('warn', 'it is just a warning message');
+    box.logger.push('error', 'it is just an error');
+    box.logger.push('exception', 'this is an exception and it is very bad');
+}
+
+function disposeLogger(box) {
+    box.logger.dispose();
+}
+
+
+
+
 
 
 // -------------------------------------- //
@@ -183,6 +207,7 @@ function initTemplate(box) {
     var templateData = {};
     
     templateData['sandbox'] = box.sandbox.el;
+    templateData['logger'] = box.logger.el;
     
     Object.keys(box.editors).forEach(function(editorName) {
         templateData[editorName] = box.editors[editorName].el; 

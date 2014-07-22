@@ -26,6 +26,9 @@ var dom = (function($) {
         remove: function(el) {
             $(el).remove();
         },
+        empty: function(el) {
+            $(el).empty();
+        },
         addClass: function(el, className) {
             $(el).addClass(className);
         },
