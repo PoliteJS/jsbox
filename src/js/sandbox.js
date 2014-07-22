@@ -15,7 +15,9 @@
  */
 
 
-var createSandbox;
+var sandboxEngine = {
+    create: null
+};
 
 (function() {
     
@@ -27,7 +29,6 @@ var createSandbox;
         init: function(options) {
             this.options = extend({}, SandboxDefaults, options || {});
             this.el = dom.create('div', null, 'jsbox-sandbox');
-            $(this.el).append('<b>sandbox</b>'); //
             this.reset();
         },
         dispose: function() {
@@ -130,7 +131,7 @@ var createSandbox;
     }
     
     // Factory Method
-    createSandbox = function(options) {
+    sandboxEngine.create = function(options) {
         var instance = Object.create(Sandbox);
         instance.init(options);
         return instance;

@@ -4,23 +4,33 @@
 
 var JSBoxDefaults = {
     
+    disabled: false,
+    template: null,
+    
     // editors
     editors: {
-        html: '<p>a paragraph</p>',
-        css: 'p { color: blue }',
-        js: 'document.querySelector("p").innerHTML = "foo";'
+        html: '',
+        css: '',
+        js: ''
     },
     
+    // tests list
+    tests: [],
+    
     // adapter injection
-    editorFactory: createTextEditor,
-    sandboxFactory: createSandbox
+    engines: {
+        editor: textEditorEngine,
+        sandbox: sandboxEngine,
+        template: templateEngine
+    }
+    
 };
 
 var JSBox = {
     init: function(options) {
         this.options = extend({}, JSBoxDefaults, options || {});
         this.editors = {};
-        console.log('init instance', options);
+        this.tests = this.options.tests || [];
         
         initDOM(this);
         
@@ -28,14 +38,20 @@ var JSBox = {
         
         initSandbox(this);
         
-        this.enable();
+        initTemplate(this);
+        
+        if (this.options.disabled === true) {
+            this.disable();
+        } else {
+            this.enable();
+        }
     },
     dispose: function() {
-        console.log("DISPOSE");
         disposeEditors(this);
-        disposeDOM(this);
         disposeSandbox(this);
         disposePubSub(this);
+        disposeTemplate(this);
+        disposeDOM(this);
     },
     on: function(event, handler) {
         subscribe(this, event, handler);
@@ -59,16 +75,16 @@ var JSBox = {
     execute: function() {
         var box = this;
         
-        var run = {
-            source: {},
-            tests: ['a == true', 'a === true']
-        };
+        // sandbox context
+        var sources = {};
         
+        // populate the sandbox source code
         Object.keys(box.editors).forEach(function(editorName) {
-            run.source[editorName] = box.editors[editorName].getSource();
+            sources[editorName] = box.editors[editorName].getSource();
         });
         
-        this.sandbox.execute(run.source, run.tests);
+        console.log(this.tests);
+        this.sandbox.execute(sources, this.tests);
     }
 };
 
@@ -79,7 +95,7 @@ var JSBox = {
 
 
 function initDOM(box) {
-    box.el = dom.create('div', '', 'jsbox', 'mona');
+    box.el = dom.create('div', '', 'jsbox');
 }
 
 function disposeDOM(box) {
@@ -87,19 +103,33 @@ function disposeDOM(box) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 function initEditors(box) {
     Object.keys(box.options.editors).forEach(function(editorName) {
         if (box.options.editors[editorName] === false) {
             return;
         }
-        box.editors[editorName] = box.options.editorFactory({
+        var source = '';
+        if (typeof box.options.editors[editorName] === 'string') {
+            source = box.options.editors[editorName];
+        }
+        box.editors[editorName] = box.options.engines.editor.create({
             language: editorName,
-            source: box.options.editors[editorName]
+            source: source
         });
         box.editors[editorName].on('cmd-execute', box.execute.bind(box));
         box.editors[editorName].on('cmd-reset', box.reset.bind(box));
-        
-        dom.append(box.editors[editorName].el, box.el);
     });
 }
 
@@ -114,8 +144,7 @@ function disposeEditors(box) {
 
 
 function initSandbox(box) {
-    box.sandbox = box.options.sandboxFactory({});
-    dom.append(box.sandbox.el, box.el);
+    box.sandbox = box.options.engines.sandbox.create({});
     
     box.sandbox.on('test-result', function(test, result) {
         console.log(test, result);
@@ -126,8 +155,31 @@ function initSandbox(box) {
     });
 }
 
-function disposeSandbox() {
+function disposeSandbox(box) {
     box.sandbox.dispose();
+}
+
+
+
+
+
+
+
+function initTemplate(box) {
+    var templateData = {};
+    
+    templateData['sandbox'] = box.sandbox.el;
+    
+    Object.keys(box.editors).forEach(function(editorName) {
+        templateData[editorName] = box.editors[editorName].el; 
+    });
+    
+    box.template = box.options.engines.template.create(box.el, box.options.template);
+    box.template.render(templateData);
+}
+
+function disposeTemplate(box) {
+    box.template.dispose();
 }
 
 

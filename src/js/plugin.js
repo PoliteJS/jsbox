@@ -20,7 +20,12 @@
         });
         
         var jsbox = create({
-            js: 'a = true'
+            editors: {
+                html: '<p>a paragraph</p>',
+                css: 'p { color: blue }',
+                js: 'document.querySelector("p").innerHTML = "foo";'
+            },
+            tests: ['a == true', 'a === true']
         });
         
         // chained jsboxes

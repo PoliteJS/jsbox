@@ -12,7 +12,9 @@
  */
 
 
-var createTextEditor;
+var textEditorEngine = {
+    create: null
+};
 
 (function() {
     
@@ -26,7 +28,7 @@ var createTextEditor;
     var TextEditor = {
         init: function(options) {
             this.options = extend({}, TextEditorDefaults, options || {});
-            this.el = dom.create('textarea', null, 'jsbox-texteditor');
+            this.el = dom.create('textarea', null, 'jsbox-texted jsbox-texted-' + this.options.language);
             this.setSource(this.options.source, true);
             onKeyDown(this);
             onKeyUp(this);
@@ -110,7 +112,7 @@ var createTextEditor;
     
     
     // Factory Method
-    createTextEditor = function(options) {
+    textEditorEngine.create = function(options) {
         var instance = Object.create(TextEditor);
         instance.init(options);
         return instance;
