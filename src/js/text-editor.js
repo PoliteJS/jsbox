@@ -12,6 +12,10 @@
  */
 
 
+/**
+ * This is the external interface which is used by JSBox to create
+ * a brand new instance. It's a factory method.
+ */
 var textEditorEngine = {
     create: null
 };

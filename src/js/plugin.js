@@ -1,3 +1,9 @@
+/**
+ * JSBox jQuery Plugin
+ * ===================
+ *
+ * It is responsible to fetch DOM data from the page and create JSBox instances.
+ */
 
 // jQuery Wrapper
 (function($, create) {
@@ -19,6 +25,7 @@
             next: $this.attr('data-jsbox-next') || ''
         });
         
+        // !!! data must be fetched from data-attributes!
         var jsbox = create({
             editors: {
                 html: '<p>a paragraph</p>',

@@ -92,7 +92,9 @@ var JSBox = {
 
 
 
-
+// ----------------------------- //
+// ---[   I N I T   D O M   ]--- //
+// ----------------------------- //
 
 function initDOM(box) {
     box.el = dom.create('div', '', 'jsbox');
@@ -113,7 +115,9 @@ function disposeDOM(box) {
 
 
 
-
+// ------------------------------------- //
+// ---[   I N I T   E D I T O R S   ]--- //
+// ------------------------------------- //
 
 function initEditors(box) {
     Object.keys(box.options.editors).forEach(function(editorName) {
@@ -143,6 +147,11 @@ function disposeEditors(box) {
 
 
 
+
+
+// ------------------------------------- //
+// ---[   I N I T   S A N D B O X   ]--- //
+// ------------------------------------- //
 function initSandbox(box) {
     box.sandbox = box.options.engines.sandbox.create({});
     
@@ -164,6 +173,11 @@ function disposeSandbox(box) {
 
 
 
+
+
+// -------------------------------------- //
+// ---[   I N I T  T E M P L A T E   ]--- //
+// -------------------------------------- //
 
 function initTemplate(box) {
     var templateData = {};

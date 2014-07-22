@@ -1,20 +1,33 @@
 /**
- * Simple Text Editor Adapter
+ * Simple Template Engine
+ * ======================
+ *
+ * this component is responsible to dispose available JSBox 
+ * elements within the DOM Wrapper.
+ *
+ * template:simple -    all available elements are just listed one
+ *                      after one.
+ *
+ * template:advanced -  a tab panel structure is provided and
+ *                      some js events are added to enable tab switching
+ *                      mechanism
  *
  * INTERFACE:
- * setSource()
- * getSource()
+ * render()
+ * dispose()
  *
- * EVENTS:
- * source-update
- * cmd-execute
- * cmd-reset
  */
 
 
+/**
+ * This is the external interface which is used by JSBox to create
+ * a brand new instance. It's a factory method.
+ */
 var templateEngine = {
     create: null
 };
+
+
 
 (function() {
     
@@ -30,6 +43,9 @@ var templateEngine = {
                 case 'simple':
                     renderSimple(this.target, data);
                     break;
+                case 'advanced':
+                    dom.append("-- JSBox Advance Template yet to be implemented--", this.target);
+                    break;
                 default:
                     dom.append("-- JSBox unknown template--", this.target);
             }
@@ -38,10 +54,10 @@ var templateEngine = {
     
     
     function renderSimple(target, data) {
+        target.classList.add('jsbox-template-simple');
         var keys = Object.keys(data);
         ['html','css','js','sandbox'].forEach(function(key) {
             if (keys.indexOf(key) !== -1) {
-//                var el = dom.create('div', null, 'jsbox-wrapper-' + key, data[key]);
                 dom.append(data[key], target);
             }
         });
