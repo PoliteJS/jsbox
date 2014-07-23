@@ -43,6 +43,9 @@ var textEditorEngine = {
             this.el = null;
             disposePubSub(this);
         },
+        reset: function() {
+            this.setSource(this.options.source, true);
+        },
         on: function(e, cb) {
             subscribe(this, e, cb);
         },

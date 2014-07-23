@@ -74,9 +74,16 @@ var JSBox = {
         dom.addClass(this.el, 'jsbox-disabled');
     },
     reset: function() {
+        var box = this;
         console.log('reset');
+        this.sandbox.reset();
+        this.logger.reset();
+        Object.keys(box.editors).forEach(function(editorName) {
+            box.editors[editorName].reset();
+        });
     },
     execute: function() {
+        
         var box = this;
         
         // sandbox context
@@ -87,7 +94,8 @@ var JSBox = {
             sources[editorName] = box.editors[editorName].getSource();
         });
         
-        console.log(this.tests);
+        this.logger.reset();
+        this.sandbox.reset();
         this.sandbox.execute(sources, this.tests);
     }
 };
@@ -160,12 +168,13 @@ function initSandbox(box) {
     box.sandbox = box.options.engines.sandbox.create({});
     
     box.sandbox.on('test-result', function(test, result) {
-        console.log(test, result);
+        console.log("TEST", test, result);
     });
     
     box.sandbox.on('finish', function(scope, result) {
-        console.log(scope.document.body, result);
+        console.log("FINISH", scope.document.body, result);
     });
+    
 }
 
 function disposeSandbox(box) {
@@ -184,10 +193,16 @@ function disposeSandbox(box) {
 function initLogger(box) {
     box.logger = box.options.engines.logger.create();
     
-    box.logger.push('log', 'it is just a log');
-    box.logger.push('warn', 'it is just a warning message');
-    box.logger.push('error', 'it is just an error');
-    box.logger.push('exception', 'this is an exception and it is very bad');
+    ['log', 'warn', 'error'].forEach(function(type) {
+        box.sandbox.on(type, function(message) {
+            box.logger.push(type, message);
+        });
+    });
+    
+    box.sandbox.on('exception', function(e) {
+        console.log("SANDBOX EXCEPTION", e);
+    });
+    
 }
 
 function disposeLogger(box) {

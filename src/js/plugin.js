@@ -30,7 +30,8 @@
             editors: {
                 html: '<p>a paragraph</p>',
                 css: 'p { color: blue }',
-                js: 'document.querySelector("p").innerHTML = "foo";'
+                js: 'document.querySelector("p").innerHTML = "foo";console.log("this is a log");console.warn("this is a warn");console.error("this is an error");',
+//                js: 'var done = async();setTimeout(done, 500);'
             },
             tests: ['a == true', 'a === true']
         });

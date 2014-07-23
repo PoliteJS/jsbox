@@ -35,9 +35,10 @@ var sandboxEngine = {
         init: function(options) {
             this.options = extend({}, SandboxDefaults, options || {});
             this.el = dom.create('div', null, 'jsbox-sandbox');
-            this.reset();
+            this.reset(true);
         },
         dispose: function() {
+            removeIframe(this);
             disposePubSub(this);
             this.el = null;
         },
@@ -45,21 +46,18 @@ var sandboxEngine = {
             subscribe(this, e, cb);
         },
         execute: function(source, tests) {
-            this.reset();
+            this.reset(true);
             execute(this, source, tests);
         },
         reset: function(silent) {
-            if (this.iframe) {
-                dom.remove(this.iframe);
-                this.iframe = null;
-            }
-            this.iframe = dom.create('iframe', null, 'jsbox-sandbox-runner');
-            dom.append(this.iframe, this.el);
+            removeIframe(this);
+            createIframe(this);
             if (silent !== true) {
                 publish(this, 'reset');
             }
         }
     };
+    
     
     
     
@@ -77,49 +75,25 @@ var sandboxEngine = {
             html: ''
         }, source);
         
-        // test for syntax error in source code
-        try {
-            var fn = new Function(source.js);
-        } catch(e) {
-            publish(this, 'exception', e);
-            publish(this, 'finish', scope);
-            return;
-        }
+        fakeConsole(box, scope);
         
-        function runTests() {
-            var _result = true;
-            tests.forEach(function(test, index) {
-                box.iframe.contentWindow.sandboxTestResultsHandler = function(result) {
-                    publish(box, 'test-result', test, result, index, scope);
-                    _result = _result && result;
-                };
-                
-                var script = document.createElement('script');
-                script.appendChild(document.createTextNode('try {sandboxTestResultsHandler(' + test + ');} catch (e) {sandboxTestResultsHandler(false);}'));
-                scope.document.body.appendChild(script);
-                
-            });
-            publish(box, 'finish', scope, _result);
-            publish(box, _result ? 'success' : 'failure', scope);
-        }
-        
-        scope.sandboxCatchErrors = function(e) {
-            console.log("ERROR", e);
-        };
-        
-        scope.async = function() {
-            async = true;
-            return runTests.bind(scope);
+        scope.sandboxSourceErrors = function(e) {
+            publish(box, 'exception', e);
         };
         
         scope.asyncEnd = function() {
-            runTests.call(scope);
+            test(box, scope, tests);
         };
         
         scope.syncEnd = function() {
             if (!async) {
-                runTests.call(scope);
+                scope.asyncEnd();
             }
+        };
+        
+        scope.async = function() {
+            async = true;
+            return scope.asyncEnd;
         };
         
         scope.document.open();
@@ -129,12 +103,102 @@ var sandboxEngine = {
             '</style></head><body>',
             source.html,
             '<script>',
-            'try {' + source.js + '} catch(e) { sandboxCatchErrors(e); };',
+            'try {' + source.js + '} catch(e) {sandboxSourceErrors(e)};',
             'syncEnd();',
             '</script></body></html>'
         ].join(''));
         scope.document.close();
     }
+    
+    
+    function test(sandbox, scope, tests) {
+        var fullResult = true;
+        
+        tests.forEach(function(test, index) {
+            
+            scope.sandboxTestResultsHandler = function(partialResult) {
+                publish(sandbox, 'test-result', test, partialResult, index, scope);
+                fullResult = fullResult && partialResult;
+            };
+
+            var script = document.createElement('script');
+            script.appendChild(document.createTextNode('try {sandboxTestResultsHandler(' + test + ')} catch (e) {sandboxTestResultsHandler(false)}'));
+            scope.document.body.appendChild(script);
+
+        });
+        
+        publish(sandbox, 'finish', scope, fullResult);
+        publish(sandbox, fullResult ? 'success' : 'failure', scope);
+    }
+    
+    
+    
+    
+    
+    function createIframe(sandbox) {
+        sandbox.iframe = dom.create('iframe', null, 'jsbox-sandbox-runner');
+        dom.append(sandbox.iframe, sandbox.el);
+    }
+    
+    function removeIframe(sandbox) {
+        if (sandbox.iframe) {
+            dom.remove(sandbox.iframe);
+            sandbox.iframe = null;
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    // ------------------------------------- //
+    // ---[   F A K E   C O N S O L E   ]--- //
+    // ------------------------------------- //
+    
+    function fakeConsole(sandbox, scope) {
+        scope.console = {};
+        ['log','warn','error'].forEach(function(type) {
+            scope.console[type] = function() {
+                var args = Array.prototype.slice.call(arguments);
+                publish(sandbox, type, consoleLogArg(args), args); 
+            };
+        });
+    }
+    
+    function consoleLogArgs(args) {
+        return args.map(consoleLogArg).join(', ');
+    };
+
+    function consoleLogArg(item) {
+        switch (typeof item) {
+            case 'string':
+                return '"' + item + '"';
+            case 'object':
+                if (Object.prototype.toString.call(item) === '[object Date]') {
+                    return item.toString();
+                } else if (Array.isArray(item)) {
+                    return '[' + item.map(consoleLogArg).join(', ') + ']';
+                } else {
+                    return '{' + Object.keys(item).map(function(key) {
+                        return key + ':' + consoleLogArg(item[key]);
+                    }).join(', ') + '}';
+                }
+            case 'function':
+                return item.toString();
+            case 'boolean':
+                return item.toString().toUpperCase();
+        }
+        return item;
+    }
+    
+    
+    
+    
+    
+    
+    
     
     // Factory Method
     sandboxEngine.create = function(options) {
