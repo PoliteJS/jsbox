@@ -67,7 +67,7 @@ var sandboxEngine = {
         var scope = box.iframe.contentWindow;
         var async = false;
         
-        publish(box, 'start');
+        publish(box, 'start', scope);
         
         source = extend({
             js: '',

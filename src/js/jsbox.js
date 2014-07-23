@@ -22,6 +22,7 @@ var JSBoxDefaults = {
         editor: textEditorEngine,
         sandbox: sandboxEngine,
         logger: loggerEngine,
+        testsList: testsListEngine,
         template: templateEngine
     }
     
@@ -31,17 +32,12 @@ var JSBox = {
     init: function(options) {
         this.options = extend({}, JSBoxDefaults, options || {});
         this.editors = {};
-        this.tests = this.options.tests || [];
-        
-        initDOM(this);
-        
-        initEditors(this);
         
         initSandbox(this);
-        
+        initEditors(this);
         initLogger(this);
-        
-        initTemplate(this);
+        initTestsList(this);
+        initDOM(this);
         
         if (this.options.disabled === true) {
             this.disable();
@@ -50,12 +46,12 @@ var JSBox = {
         }
     },
     dispose: function() {
-        disposeEditors(this);
         disposeSandbox(this);
+        disposeEditors(this);
         disposeLogger(this);
-        disposePubSub(this);
-        disposeTemplate(this);
+        disposeTestsList(this);
         disposeDOM(this);
+        disposePubSub(this);
     },
     on: function(event, handler) {
         subscribe(this, event, handler);
@@ -74,49 +70,53 @@ var JSBox = {
         dom.addClass(this.el, 'jsbox-disabled');
     },
     reset: function() {
-        var box = this;
-        console.log('reset');
-        this.sandbox.reset();
+        this.softReset();
+        resetEditors(this);
+    },
+    softReset: function() {
+        this.testsList.reset();
         this.logger.reset();
-        Object.keys(box.editors).forEach(function(editorName) {
-            box.editors[editorName].reset();
-        });
+        this.sandbox.reset();
     },
     execute: function() {
-        
-        var box = this;
-        
-        // sandbox context
-        var sources = {};
-        
-        // populate the sandbox source code
-        Object.keys(box.editors).forEach(function(editorName) {
-            sources[editorName] = box.editors[editorName].getSource();
-        });
-        
-        this.logger.reset();
-        this.sandbox.reset();
-        this.sandbox.execute(sources, this.tests);
+        this.softReset();
+        this.sandbox.execute(boxSources(this), this.testsList.getList());
     }
 };
 
-
-
-
-
-// ----------------------------- //
-// ---[   I N I T   D O M   ]--- //
-// ----------------------------- //
-
-function initDOM(box) {
-    box.el = dom.create('div', '', 'jsbox');
-}
-
-function disposeDOM(box) {
-    dom.remove(box.el);
+function boxSources(box) {
+    var sources = {};
+    Object.keys(box.editors).forEach(function(editorName) {
+        sources[editorName] = box.editors[editorName].getSource();
+    });
+    return sources;
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ------------------------------------- //
+// ---[   I N I T   S A N D B O X   ]--- //
+// ------------------------------------- //
+function initSandbox(box) {
+    box.sandbox = box.options.engines.sandbox.create();
+}
+
+function disposeSandbox(box) {
+    box.sandbox.dispose();
+}
 
 
 
@@ -156,30 +156,18 @@ function disposeEditors(box) {
     box.editors = null;
 }
 
-
-
-
-
-
-// ------------------------------------- //
-// ---[   I N I T   S A N D B O X   ]--- //
-// ------------------------------------- //
-function initSandbox(box) {
-    box.sandbox = box.options.engines.sandbox.create({});
-    
-    box.sandbox.on('test-result', function(test, result) {
-        console.log("TEST", test, result);
+function resetEditors(box) {
+    Object.keys(box.editors).forEach(function(editorName) {
+        box.editors[editorName].reset();
     });
-    
-    box.sandbox.on('finish', function(scope, result) {
-        console.log("FINISH", scope.document.body, result);
-    });
-    
 }
 
-function disposeSandbox(box) {
-    box.sandbox.dispose();
-}
+
+
+
+
+
+
 
 
 
@@ -214,15 +202,50 @@ function disposeLogger(box) {
 
 
 
-// -------------------------------------- //
-// ---[   I N I T  T E M P L A T E   ]--- //
-// -------------------------------------- //
 
-function initTemplate(box) {
+
+
+
+
+// ------------------------------------------- //
+// ---[   I N I T   T E S T S   L I S T   ]--- //
+// ------------------------------------------- //
+
+function initTestsList(box) {
+    box.testsList = box.options.engines.testsList.create(box.options.tests);
+    
+    box.sandbox.on('test-result', function(test, result) {
+        box.testsList.setStatus(test, result);
+    });
+    
+}
+
+function disposeTestsList(box) {
+    box.testsList.dispose();
+}
+
+
+
+
+
+
+
+
+
+// ----------------------------- //
+// ---[   I N I T   D O M   ]--- //
+// ----------------------------- //
+
+function initDOM(box) {
+    box.el = dom.create('div', '', 'jsbox');
+    
+    // template config
+    
     var templateData = {};
     
-    templateData['sandbox'] = box.sandbox.el;
-    templateData['logger'] = box.logger.el;
+    ['sandbox','logger','testsList'].forEach(function(cmp) {
+        templateData[cmp] = box[cmp].el;
+    });
     
     Object.keys(box.editors).forEach(function(editorName) {
         templateData[editorName] = box.editors[editorName].el; 
@@ -230,11 +253,28 @@ function initTemplate(box) {
     
     box.template = box.options.engines.template.create(box.el, box.options.template);
     box.template.render(templateData);
+    
+    
+    // running events
+    
+    box.sandbox.on('start', function(scope) {
+        dom.addClass(box.el, 'jsbox-running');
+    });
+    
+    box.sandbox.on('finish', function(scope, result) {
+        dom.removeClass(box.el, 'jsbox-running');
+    });
+    
 }
 
-function disposeTemplate(box) {
+function disposeDOM(box) {
     box.template.dispose();
+    dom.remove(box.el);
 }
+
+
+
+
 
 
 

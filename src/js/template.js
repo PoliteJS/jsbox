@@ -56,7 +56,7 @@ var templateEngine = {
     function renderSimple(target, data) {
         target.classList.add('jsbox-tpl-simple');
         var keys = Object.keys(data);
-        ['html','css','js','sandbox','logger'].forEach(function(key) {
+        ['html','css','js','testsList','sandbox','logger'].forEach(function(key) {
             if (keys.indexOf(key) !== -1) {
                 var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);
                 dom.append(data[key], wrapper);
