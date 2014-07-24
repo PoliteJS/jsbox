@@ -6,8 +6,113 @@
  */
 
 // jQuery Wrapper
-(function($, create) {
+(function($) {
 
+    
+
+    /**
+     * Global writable defaults
+     */
+    $.jsboxDefaults = {};
+
+    /**
+     * jQuery Plugin
+     */
+    $.fn.jsbox = function() {
+        var $this = $(this);
+        var args = Array.prototype.slice.call(arguments);
+
+        // simple setup
+        if (!args.length) {
+            $this.each(init, [$.jsboxDefaults]);
+
+        // config setup
+        } else if ($.isPlainObject(args[0])) {
+            var config = $.extend({}, $.jsboxDefaults, args[0]);
+            $this.each(init, [config]);
+
+        // custom call with string params
+        } else {
+            switch (args[0]) {
+                case 'instance':
+                    return $this.data('jsbox');
+                case 'dispose':
+                    $this.each(dispose);
+                    break;
+                default:
+                    throw 'JSBox does not support "' + args[0].toString() + '" API call';
+            }
+        }
+
+        return this;
+    };
+
+
+    /**
+     * Widgets auto setup
+     */
+    $(document).ready(function() {
+        $('[data-jsbox]').jsbox();
+    });
+    
+    
+    
+    
+    
+    
+    function buildConfig($el) {
+        var $html, $css, $js, $code, $tests;
+        var config = {
+            editors: {
+                html: false,
+                css: false,
+                js: ''
+            },
+            tests: []
+        };
+        
+        $js = $el.find('[data-js]')
+        if ($js.length) {
+            config.editors.js = $js.html();
+        }
+        
+        $css = $el.find('[data-css]')
+        if ($css.length) {
+            config.editors.css = $css.html();
+        }
+        
+        $html = $el.find('[data-html]')
+        if ($html.length) {
+            config.editors.html = $html.html();
+        }
+        
+        $code = $el.find('code').filter(function() {
+            var $this = $(this);
+            if ($this.attr('data-html') !== undefined || 
+                $this.attr('data-css') !== undefined || 
+                $this.attr('data-js') !== undefined) {
+                return false;
+            }
+            return true;
+        });
+        
+        if (!$js.length && $code.length) {
+            config.editors.js = $code.html();
+        }
+        
+        $tests = $el.find('[data-tests]');
+        if (!$tests.length) {
+            $tests = $el.find('>ul');
+        }
+        $tests.children().each(function() {
+            config.tests.push($(this).html());
+        });
+        
+        return config;
+    }
+    
+    
+    
     /**
      * Instance Initialization Method
      * each instance is being attached to the DOM Data of the target object
@@ -20,21 +125,9 @@
         if ($this.data('jsbox') && $this.data('jsbox') !== true) {
             return;
         }
-
-        config = $.extend({}, config, {
-            next: $this.attr('data-jsbox-next') || ''
-        });
         
-        // !!! data must be fetched from data-attributes!
-        var jsbox = create({
-            editors: {
-                html: '<p>a paragraph</p>',
-                css: 'p { color: blue }',
-                js: 'document.querySelector("p").innerHTML = "foo";console.log("this is a log");console.warn("this is a warn");console.error("this is an error");',
-                js: 'var done = async();setTimeout(done, 500);'
-            },
-            tests: ['a == true', 'a === true']
-        });
+        config = $.extend(true, {}, config, buildConfig($this));
+        var jsbox = createJsbox(config);
         
         // chained jsboxes
         // needs to understand how to dispose properly!
@@ -71,60 +164,7 @@
             $.removeData(this, 'jsbox');
         }
     }
-
-    /**
-     * Global writable defaults
-     */
-    $.jsboxDefaults = {
-        code: '',
-        codeQuery: 'code',
-        tests: [],
-        testsQuery: 'ul>li',
-        editor: null, // custom editor adapter
-        sandbox: null, // custom text execution sandbox 
-        updateDelay: 300
-    };
-
-    /**
-     * jQuery Plugin
-     */
-    $.fn.jsbox = function() {
-
-        var args = Array.prototype.slice.call(arguments);
-
-        // simple setup
-        if (!args.length) {
-            $(this).each(init, [$.jsboxDefaults]);
-
-        // config setup
-        } else if ($.isPlainObject(args[0])) {
-            var config = $.extend({}, $.jsboxDefaults, args[0]);
-            $(this).each(init, [config]);
-
-        // custom call with string params
-        } else {
-            switch (args[0]) {
-                case 'instance':
-                    return $(this).data('jsbox');
-                case 'dispose':
-                    $(this).each(dispose);
-                    break;
-                default:
-                    throw 'JSBox does not support "' + args[0].toString() + '" API call';
-            }
-        }
-
-        return this;
-    };
-
-
-    /**
-     * Widgets auto setup
-     */
-    $(document).ready(function() {
-        $('[data-jsbox]').jsbox();
-    });
     
 
 // jQuery Wrapper
-})(jQuery, createJsbox);
+})(jQuery);

@@ -52,13 +52,20 @@
         </p>
         -->
         
+        <div class="jsbox" data-jsbox></div>
+        
+        <hr>
+        
         <div class="jsbox"  data-jsbox>
-            <code>var a = </code>
-            <ul>
-                <li>a === true</li>
+            <code data-html><p>foo</p></code>
+            <code data-css>p {color:blue}</code>
+            <code data-js>document.querySelector('p').innerHTML = 'peg';</code>
+            <div data-tests>
+                <code>document.querySelector('p').innerHTML.length === 3</code>
             </ul>
         </div>
         
+<!--
         <hr>
         
         <h2>Enable / Disable</h2>
@@ -88,5 +95,6 @@
             <a href="http://politejs.com/jsbox">http://PoliteJS/jsbox</a>
         </p>
        
+-->
     </body>
 </html>

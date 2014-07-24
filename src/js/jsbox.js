@@ -9,8 +9,8 @@ var JSBoxDefaults = {
     
     // editors
     editors: {
-        html: '',
-        css: '',
+        html: false,
+        css: false,
         js: ''
     },
     

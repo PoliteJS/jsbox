@@ -33,6 +33,7 @@ var textEditorEngine = {
         init: function(options) {
             this.options = extend({}, TextEditorDefaults, options || {});
             this.el = dom.create('textarea', null, 'jsbox-texted jsbox-texted-' + this.options.language);
+            this.el.setAttribute('placeholder', this.options.language);
             this.setSource(this.options.source, true);
             onKeyDown(this);
             onKeyUp(this);
