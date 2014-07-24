@@ -10,7 +10,7 @@
         <script src="../lib/jquery-2.1.1.min.js"></script>
         
         <!-- JSBox -->
-<!--        <link rel="stylesheet" href="../build/jquery.jsbox.css">-->
+        <link rel="stylesheet" href="../build/jquery.jsbox.css">
         <script src="../build/jquery.jsbox.js"></script>
         
     </head>
@@ -52,20 +52,30 @@
         </p>
         -->
         
-        <div class="jsbox" data-jsbox></div>
+        <div data-jsbox></div>
         
         <hr>
         
-        <div class="jsbox"  data-jsbox>
+        <div data-jsbox>
+            <code>async();setTimeout(function() {console.log("this is a log");console.warn("this is a warning");console.error("this is an error");asyncEnd();}, 1000);</code>
+            <ul>
+                <li>a == true</li>
+                <li>a === true</li>
+            </ul>
+        </div>
+        
+        <hr>
+        
+        <div data-jsbox>
             <code data-html><p>foo</p></code>
             <code data-css>p {color:blue}</code>
             <code data-js>document.querySelector('p').innerHTML = 'peg';</code>
             <div data-tests>
-                <code>document.querySelector('p').innerHTML.length === 3</code>
-            </ul>
+                <code>document.querySelector('p').innerHTML.length === 5</code>
+                <code>window.document === document</code>
+            </div>
         </div>
         
-<!--
         <hr>
         
         <h2>Enable / Disable</h2>
@@ -95,6 +105,5 @@
             <a href="http://politejs.com/jsbox">http://PoliteJS/jsbox</a>
         </p>
        
--->
     </body>
 </html>

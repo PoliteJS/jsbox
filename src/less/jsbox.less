@@ -7,8 +7,9 @@
  * Theme Config
  */
 
-
-
+@fontSize: 11pt;
+@fontFamily: sans-serif;
+@borderDarkColor: #555;
 
 /**
  * Import Libraries
@@ -22,10 +23,18 @@
  * Import Modules
  */
 
-@import "modules/widget.less";
-@import "modules/overlay.less";
-@import "modules/editor.less";
-@import "modules/tests.less";
-@import "modules/console.less";
-@import "modules/sandbox.less";
-@import "modules/exception.less";
+.jsbox {
+    font-size: @fontSize;
+    font-family: @fontFamily;
+    background: #fafafa;
+}
+
+.jsbox-running {
+    background: #ffe200;
+}
+
+.jsbox-plugin-enabled {
+    display: none;
+}
+
+@import "template-simple/template.less";

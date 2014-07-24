@@ -25,16 +25,18 @@ var testsListEngine = {
     
     var TestsListEngine = {
         init: function(tests) {
-            this.el = dom.create('ul', null, 'jsbox-testlist');
+            this.el = dom.create('ul', null, 'jsbox-tests-list');
             this.tests = [];
+            this.reset();
             tests.forEach(this.push.bind(this));
         },
         dispose: function() {
             dom.remove(this.el);
         },
         push: function(test) {
-            var testEl = dom.create('li', null, 'jsbox-testlist-item', test);
+            var testEl = dom.create('li', null, 'jsbox-tests-list-item', test);
             dom.append(testEl, this.el);
+            dom.removeClass(this.el, 'jsbox-tests-list-empty');
             this.tests.push({
                 code: test,
                 el: testEl
@@ -46,9 +48,14 @@ var testsListEngine = {
             });
         },
         reset: function() {
+            if (this.tests.length === 0) {
+                dom.addClass(this.el, 'jsbox-tests-list-empty');
+            } else {
+                dom.removeClass(this.el, 'jsbox-tests-list-empty');
+            }
             this.tests.forEach(function(item) {
-                dom.removeClass(item.el, 'jsbox-testlist-ok');
-                dom.removeClass(item.el, 'jsbox-testlist-ko');
+                dom.removeClass(item.el, 'jsbox-tests-list-item-ok');
+                dom.removeClass(item.el, 'jsbox-tests-list-item-ko');
             });
         },
         setStatus: function(test, status) {
@@ -56,9 +63,9 @@ var testsListEngine = {
                 return item.code === test;
             }).forEach(function(item) {
                 if (status) {
-                    dom.addClass(item.el, 'jsbox-testlist-ok');
+                    dom.addClass(item.el, 'jsbox-tests-list-item-ok');
                 } else {
-                    dom.addClass(item.el, 'jsbox-testlist-ko');
+                    dom.addClass(item.el, 'jsbox-tests-list-item-ko');
                 }
             });
         }

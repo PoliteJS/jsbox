@@ -68,6 +68,9 @@
                 css: false,
                 js: ''
             },
+            sandbox: {
+                visible: false
+            },
             tests: []
         };
         
@@ -79,11 +82,13 @@
         $css = $el.find('[data-css]')
         if ($css.length) {
             config.editors.css = $css.html();
+            config.sandbox.visible = true;
         }
         
         $html = $el.find('[data-html]')
         if ($html.length) {
             config.editors.html = $html.html();
+            config.sandbox.visible = true;
         }
         
         $code = $el.find('code').filter(function() {
@@ -131,20 +136,21 @@
         
         // chained jsboxes
         // needs to understand how to dispose properly!
-        if (config.next) {
-            var next;
-            $(document).delegate(config.next, 'jsbox-ready', function(e, _next) {
-                next = _next;
-                next.disable();
-            });
-            jsbox.on('status', function(status) {
-                if (status && next) {
-                    next.enable();
-                }
-            });
-        }
+//        if (config.next) {
+//            var next;
+//            $(document).delegate(config.next, 'jsbox-ready', function(e, _next) {
+//                next = _next;
+//                next.disable();
+//            });
+//            jsbox.on('status', function(status) {
+//                if (status && next) {
+//                    next.enable();
+//                }
+//            });
+//        }
         
         // plugin reference and events
+        
         $this
         .addClass('jsbox-plugin-enabled')
         .after(jsbox.getEl())
@@ -157,12 +163,14 @@
      * Destroy and remove a JSBox instance from memory and DOM Data
      */
     function dispose() {
-        var jsbox = $(this).data('jsbox');
+        var $this = $(this);
+        var jsbox = $this.data('jsbox');
         if (jsbox) {
             jsbox.dispose();
             jsbox = null;
             $.removeData(this, 'jsbox');
         }
+        $this.removeClass('jsbox-plugin-enabled')
     }
     
 

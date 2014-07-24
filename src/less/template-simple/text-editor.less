@@ -1,0 +1,83 @@
+
+@dark: darken(@borderDarkColor, 10%);
+@light: lighten(@borderDarkColor, 20%);
+
+.jsbox-tpl-wrapper-editors {
+    display: block;
+    margin:5px;
+    padding:0;
+    list-style: none;
+    
+    border: 1px solid @dark;
+    border-radius: 5px;
+    overflow:hidden;
+}
+
+.jsbox-tpl-wrapper-css, .jsbox-tpl-wrapper-html, .jsbox-tpl-wrapper-js {
+    position: relative;
+    background: lighten(@borderDarkColor, 10%);
+    
+    padding-left: 5px;
+    padding-right: 5px;
+    
+    border-bottom: 1px solid @dark;
+    border-top: 1px solid @light;
+
+    &:first-child {
+        border-top: none;
+    }
+
+    &:last-child {
+        border-bottom: none;
+    }
+    
+    &:before {
+        content: 'editor';
+        position: absolute;
+        bottom:0;
+        right:0;
+        background: lighten(@light, 10%);
+        padding: 2px 5px;
+        color: @dark;
+        border-top: 1px solid @borderDarkColor;
+        border-left: 1px solid @borderDarkColor;
+        border-top-left-radius: 3px;
+        font-size: 0.7em;
+    }
+}
+
+.jsbox-tpl-wrapper-css:before {
+    content: 'CSS';
+}
+
+.jsbox-tpl-wrapper-js:before {
+    content: 'Javascript';
+}
+
+.jsbox-tpl-wrapper-html:before {
+    content: 'HTML';
+}
+
+.jsbox-texted {
+    display: block;
+    width: 100%;
+    
+    font-family: monospace;
+    font-size: @fontSize;
+    line-height: 1.3em;
+    
+    background: lighten(@borderDarkColor, 10%);
+    color: #eee;
+    text-shadow: 0 1px #000;
+    
+    outline: none;
+    resize: none;
+    white-space: nowrap;
+    overflow:auto;
+    
+    border: 0px solid @borderDarkColor;
+    
+    
+    
+}
+

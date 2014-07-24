@@ -17,6 +17,10 @@ var JSBoxDefaults = {
     // tests list
     tests: [],
     
+    sandbox: {
+        visible: false
+    },
+    
     // adapter injection
     engines: {
         editor: textEditorEngine,
@@ -111,7 +115,7 @@ function boxSources(box) {
 // ---[   I N I T   S A N D B O X   ]--- //
 // ------------------------------------- //
 function initSandbox(box) {
-    box.sandbox = box.options.engines.sandbox.create();
+    box.sandbox = box.options.engines.sandbox.create(box.options.sandbox);
 }
 
 function disposeSandbox(box) {
@@ -189,6 +193,7 @@ function initLogger(box) {
     
     box.sandbox.on('exception', function(e) {
         console.log("SANDBOX EXCEPTION", e);
+        box.logger.push('exception', e.message);
     });
     
 }
@@ -252,7 +257,7 @@ function initDOM(box) {
     });
     
     box.template = box.options.engines.template.create(box.el, box.options.template);
-    box.template.render(templateData);
+    box.template.render(templateData, box.options);
     
     
     // running events

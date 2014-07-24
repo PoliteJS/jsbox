@@ -35,6 +35,9 @@ var sandboxEngine = {
         init: function(options) {
             this.options = extend({}, SandboxDefaults, options || {});
             this.el = dom.create('div', null, 'jsbox-sandbox');
+            if (options.visible === false) {
+                dom.addClass(this.el, 'jsbox-sandbox-hidden');
+            }
             this.reset(true);
         },
         dispose: function() {
@@ -162,7 +165,7 @@ var sandboxEngine = {
         ['log','warn','error'].forEach(function(type) {
             scope.console[type] = function() {
                 var args = Array.prototype.slice.call(arguments);
-                publish(sandbox, type, consoleLogArg(args), args); 
+                publish(sandbox, type, consoleLogArgs(args), args); 
             };
         });
     }
@@ -172,6 +175,7 @@ var sandboxEngine = {
     };
 
     function consoleLogArg(item) {
+        
         switch (typeof item) {
             case 'string':
                 return '"' + item + '"';

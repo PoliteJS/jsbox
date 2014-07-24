@@ -38,10 +38,10 @@ var templateEngine = {
             
         },
         dispose: function() {},
-        render: function(data) {
+        render: function(data, options) {
             switch (this.source) {
                 case 'simple':
-                    renderSimple(this.target, data);
+                    renderSimple(this.target, data, options);
                     break;
                 case 'advanced':
                     dom.append("-- JSBox Advance Template yet to be implemented--", this.target);
@@ -53,16 +53,30 @@ var templateEngine = {
     };
     
     
-    function renderSimple(target, data) {
+    function renderSimple(target, data, options) {
         target.classList.add('jsbox-tpl-simple');
         var keys = Object.keys(data);
-        ['html','css','js','testsList','sandbox','logger'].forEach(function(key) {
+        
+        var editors = dom.create('div', null, 'jsbox-tpl-wrapper-editors');
+        
+        ['html','css','js'].forEach(function(key) {
             if (keys.indexOf(key) !== -1) {
                 var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);
+                dom.append(data[key], wrapper);
+                dom.append(wrapper, editors);
+            }
+        });
+        
+        dom.append(editors, target);
+        
+        ['testsList','sandbox','logger'].forEach(function(key) {
+            if (keys.indexOf(key) !== -1) {
+                var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);                
                 dom.append(data[key], wrapper);
                 dom.append(wrapper, target);
             }
         });
+        
     }
     
     
