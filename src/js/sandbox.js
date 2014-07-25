@@ -102,11 +102,11 @@ var sandboxEngine = {
         scope.document.open();
         scope.document.write([
             '<html><head><style>',
-            source.css,
+            source.css + '\n',
             '</style></head><body>',
-            source.html,
+            source.html + '\n',
             '<script>',
-            'try {' + source.js + '} catch(e) {sandboxSourceErrors(e)};',
+            'try {' + source.js + '\n} catch(e) {sandboxSourceErrors(e)};',
             'syncEnd();',
             '</script></body></html>'
         ].join(''));

@@ -192,7 +192,6 @@ function initLogger(box) {
     });
     
     box.sandbox.on('exception', function(e) {
-        console.log("SANDBOX EXCEPTION", e);
         box.logger.push('exception', e.message);
     });
     
