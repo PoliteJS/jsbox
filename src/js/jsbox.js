@@ -23,7 +23,7 @@ var JSBoxDefaults = {
     
     // adapter injection
     engines: {
-        editor: textEditorEngine,
+        editor: window.ace ? aceEditorEngine : textEditorEngine,
         sandbox: sandboxEngine,
         logger: loggerEngine,
         testsList: testsListEngine,
@@ -74,6 +74,7 @@ var JSBox = {
         dom.addClass(this.el, 'jsbox-disabled');
     },
     reset: function() {
+        dom.removeClass(this.el, 'jsbox-running');
         this.softReset();
         resetEditors(this);
     },

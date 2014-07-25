@@ -119,6 +119,7 @@ var textEditorEngine = {
     
     
     
+    
     // Factory Method
     textEditorEngine.create = function(options) {
         var instance = Object.create(TextEditor);

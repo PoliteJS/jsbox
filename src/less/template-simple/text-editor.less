@@ -17,11 +17,7 @@
     position: relative;
     background: lighten(@borderDarkColor, 10%);
     
-    padding-left: 5px;
-    padding-right: 5px;
-    
-    border-bottom: 1px solid @dark;
-    border-top: 1px solid @light;
+    border-bottom: 1px solid @borderDarkColor;
 
     &:first-child {
         border-top: none;
@@ -43,6 +39,7 @@
         border-left: 1px solid @borderDarkColor;
         border-top-left-radius: 3px;
         font-size: 0.7em;
+        z-index: 100;
     }
 }
 
@@ -66,18 +63,19 @@
     font-size: @fontSize;
     line-height: 1.3em;
     
-    background: lighten(@borderDarkColor, 10%);
-    color: #eee;
-    text-shadow: 0 1px #000;
+    background: #fff;
+    color: #333;
     
     outline: none;
     resize: none;
     white-space: nowrap;
     overflow:auto;
     
-    border: 0px solid @borderDarkColor;
-    
-    
-    
+    border: none;
 }
 
+.jsbox-ace {
+    display: block;
+    width: 100%;
+    height: 150px;
+}
