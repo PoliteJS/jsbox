@@ -32,49 +32,54 @@ var templateEngine = {
 (function() {
     
     var TemplateEngine = {
-        init: function(target, source) {
-            this.target = target;
-            this.source = source || 'simple';
+        init: function(box) {
+            this.el = box.el;
+            this.box = box;
+            this.options = box.options.template || {};
             
-        },
-        dispose: function() {},
-        render: function(data, options) {
-            switch (this.source) {
+            if (typeof this.options === 'string') {
+                this.options = {
+                    name: this.options
+                };
+            }
+            
+            this.options = extend({
+                name: 'simple'
+            }, this.options);
+            
+            switch (this.options.name) {
                 case 'simple':
-                    renderSimple(this.target, data, options);
+                    renderSimple(this.el, this.options, this.box);
                     break;
                 case 'advanced':
-                    dom.append("-- JSBox Advance Template yet to be implemented--", this.target);
+                    dom.append("-- JSBox Advance Template yet to be implemented--", this.box.el);
                     break;
                 default:
-                    dom.append("-- JSBox unknown template--", this.target);
+                    dom.append("-- JSBox unknown template--", this.box.el);
             }
+        },
+        dispose: function() {
+            dom.empty(this.el);
         }
     };
     
     
-    function renderSimple(target, data, options) {
+    function renderSimple(target, options, box) {
         target.classList.add('jsbox-tpl-simple');
-        var keys = Object.keys(data);
-        
+
         var editors = dom.create('div', null, 'jsbox-tpl-wrapper-editors');
-        
-        ['html','css','js'].forEach(function(key) {
-            if (keys.indexOf(key) !== -1) {
-                var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);
-                dom.append(data[key], wrapper);
-                dom.append(wrapper, editors);
-            }
-        });
-        
+        for (var key in box.editors) {
+            var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);
+            dom.append(box.editors[key].el, wrapper);
+            dom.append(wrapper, editors);
+        }
+                
         dom.append(editors, target);
         
         ['testsList','sandbox','logger'].forEach(function(key) {
-            if (keys.indexOf(key) !== -1) {
-                var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);                
-                dom.append(data[key], wrapper);
-                dom.append(wrapper, target);
-            }
+            var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);                
+            dom.append(box[key].el, wrapper);
+            dom.append(wrapper, target);
         });
         
     }

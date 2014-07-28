@@ -244,21 +244,8 @@ function disposeTestsList(box) {
 function initDOM(box) {
     box.el = dom.create('div', '', 'jsbox');
     
-    // template config
-    
-    var templateData = {};
-    
-    ['sandbox','logger','testsList'].forEach(function(cmp) {
-        templateData[cmp] = box[cmp].el;
-    });
-    
-    Object.keys(box.editors).forEach(function(editorName) {
-        templateData[editorName] = box.editors[editorName].el; 
-    });
-    
-    box.template = box.options.engines.template.create(box.el, box.options.template);
-    box.template.render(templateData, box.options);
-    
+    // create template
+    box.template = box.options.engines.template.create(box);
     
     // running events
     
