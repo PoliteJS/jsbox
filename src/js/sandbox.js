@@ -168,6 +168,13 @@ var sandboxEngine = {
                 publish(sandbox, type, consoleLogArgs(args), args); 
             };
         });
+        scope.console['assert'] = function(assertion, msg) {
+            if (assertion === true) {
+                publish(sandbox, 'assertion-passed', msg); 
+            } else {
+                publish(sandbox, 'assertion-failed', msg); 
+            }
+        };
     }
     
     function consoleLogArgs(args) {

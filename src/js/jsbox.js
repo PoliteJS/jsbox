@@ -186,7 +186,7 @@ function resetEditors(box) {
 function initLogger(box) {
     box.logger = box.options.engines.logger.create();
     
-    ['log', 'warn', 'error'].forEach(function(type) {
+    ['log', 'warn', 'error', 'assertion-passed', 'assertion-failed'].forEach(function(type) {
         box.sandbox.on(type, function(message) {
             box.logger.push(type, message);
         });

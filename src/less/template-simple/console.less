@@ -33,6 +33,20 @@
     }
 }
 
+.jsbox-logger-item-assertion-passed {
+    color: green;
+    &:before {
+        content: 'PASSED: ';
+    }
+}
+
+.jsbox-logger-item-assertion-failed {
+    color: #aa0202;
+    &:before {
+        content: 'FAILED: ';
+    }
+}
+
 .jsbox-logger-item-exception {
     background: #aa0202;
     color: #fff;
