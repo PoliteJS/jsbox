@@ -113,6 +113,10 @@
             config.tests.push($(this).html());
         });
         
+        if ($el.attr('data-jsbox-next')) {
+            config.next = $el.attr('data-jsbox-next');
+        }
+        
         return config;
     }
     
@@ -136,18 +140,19 @@
         
         // chained jsboxes
         // needs to understand how to dispose properly!
-//        if (config.next) {
-//            var next;
-//            $(document).delegate(config.next, 'jsbox-ready', function(e, _next) {
-//                next = _next;
-//                next.disable();
-//            });
-//            jsbox.on('status', function(status) {
-//                if (status && next) {
-//                    next.enable();
-//                }
-//            });
-//        }
+        if (config.next) {
+            console.log(config.next);
+            var next;
+            $(document).delegate(config.next, 'jsbox-ready', function(e, _next) {
+                next = _next;
+                next.disable();
+            });
+            jsbox.on('passed', function() {
+                if (next) {
+                    next.enable();
+                }
+            });
+        }
         
         // plugin reference and events
         

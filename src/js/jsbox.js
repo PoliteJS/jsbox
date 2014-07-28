@@ -250,11 +250,20 @@ function initDOM(box) {
     // running events
     
     box.sandbox.on('start', function(scope) {
+        dom.removeClass(box.el, 'jsbox-passed');
+        dom.removeClass(box.el, 'jsbox-failed');
         dom.addClass(box.el, 'jsbox-running');
     });
     
     box.sandbox.on('finish', function(scope, result) {
         dom.removeClass(box.el, 'jsbox-running');
+        if (result) {
+            dom.addClass(box.el, 'jsbox-passed');
+            publish(box, 'passed', box);
+        } else {
+            publish(box, 'failed', box);
+        }
+        publish(box, 'status', box, result, scope);
     });
     
 }

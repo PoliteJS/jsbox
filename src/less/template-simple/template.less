@@ -9,4 +9,22 @@
     @import "sandbox.less";
     @import "console.less";
     
+    &.jsbox-enabled {}
+    
+    &.jsbox-disabled {
+        background: orange;
+    }
+    
+    &.jsbox-running {
+        background: #ffe200;
+    }
+    
+    &.jsbox-passed {
+        border-color: green;
+    }
+
+    &.jsbox-failed {
+        border-color: brown;
+    }
+    
 }
