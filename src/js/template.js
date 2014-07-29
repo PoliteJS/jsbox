@@ -91,6 +91,7 @@ var templateEngine = {
      * 
      */
     function initEvents(box) {
+        
         box.sandbox.on('start', function(scope) {
             dom.removeClass(box.el, 'jsbox-passed');
             dom.removeClass(box.el, 'jsbox-failed');
@@ -106,6 +107,26 @@ var templateEngine = {
                 dom.addClass(box.el, 'jsbox-failed');
             }
         });
+        
+        for (var key in box.editors) {
+            box.editors[key].on('focus', setActive);
+            box.editors[key].on('blur', setInactive);
+        }
+        
+        var _timer = null;
+        function setActive() {
+            clearTimeout(_timer);
+            _timer = setTimeout(function() {
+                dom.addClass(box.el, 'jsbox-active');
+            }, 50);
+        }
+        
+        function setInactive() {
+            clearTimeout(_timer);
+            _timer = setTimeout(function() {
+                dom.removeClass(box.el, 'jsbox-active');
+            }, 50);
+        }
     }
     
     

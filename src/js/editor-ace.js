@@ -69,6 +69,13 @@ var aceEditorEngine = {
                 }
             });
             
+            this.ace.on('focus', function() {
+                publish(self, 'focus');
+            });
+            this.ace.on('blur', function() {
+                publish(self, 'blur');
+            });
+            
             this.setSource(this.options.source, true);
             
         },
