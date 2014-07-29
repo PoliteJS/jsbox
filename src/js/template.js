@@ -84,13 +84,18 @@ var templateEngine = {
             dom.append(wrapper, target);
         });
         
+        var overlay = dom.create('div', null, 'jsbox-tpl-overlay', '<p>please complete the previous exercises!</p>');
+        dom.append(overlay, target);
+        
     }
     
     
     /**
-     * 
+     * Exposes JSBOX status through DOM classes 
      */
     function initEvents(box) {
+        
+        var _activeTimer = null;
         
         box.sandbox.on('start', function(scope) {
             dom.removeClass(box.el, 'jsbox-passed');
@@ -113,17 +118,16 @@ var templateEngine = {
             box.editors[key].on('blur', setInactive);
         }
         
-        var _timer = null;
         function setActive() {
-            clearTimeout(_timer);
-            _timer = setTimeout(function() {
+            clearTimeout(_activeTimer);
+            _activeTimer = setTimeout(function() {
                 dom.addClass(box.el, 'jsbox-active');
             }, 50);
         }
         
         function setInactive() {
-            clearTimeout(_timer);
-            _timer = setTimeout(function() {
+            clearTimeout(_activeTimer);
+            _activeTimer = setTimeout(function() {
                 dom.removeClass(box.el, 'jsbox-active');
             }, 50);
         }

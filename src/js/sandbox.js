@@ -84,19 +84,23 @@ var sandboxEngine = {
             publish(box, 'exception', e);
         };
         
-        scope.asyncEnd = function() {
+        scope.jsboxTest = function() {
             test(box, scope, tests);
         };
         
-        scope.syncEnd = function() {
+        scope.jsboxSyncEnd = function() {
+            // auto detect async code
+            if (!async && source.js.indexOf('jsboxTest()') !== -1) {
+                async = true;
+            }
             if (!async) {
-                scope.asyncEnd();
+                scope.jsboxTest();
             }
         };
         
-        scope.async = function() {
+        scope.jsboxAsync = function() {
             async = true;
-            return scope.asyncEnd;
+            return scope.jsboxTest;
         };
         
         scope.document.open();
@@ -107,7 +111,7 @@ var sandboxEngine = {
             source.html + '\n',
             '<script>',
             'try {' + source.js + '\n} catch(e) {sandboxSourceErrors(e)};',
-            'syncEnd();',
+            'jsboxSyncEnd();',
             '</script></body></html>'
         ].join(''));
         scope.document.close();
@@ -124,7 +128,11 @@ var sandboxEngine = {
             
             scope.sandboxTestResultsHandler = function(partialResult) {
                 publish(sandbox, 'test-result', test, partialResult, index, scope);
-                fullResult = fullResult || true && partialResult;
+                if (fullResult === null) {
+                    fullResult = partialResult;
+                } else {
+                    fullResult = fullResult && partialResult;
+                }
             };
 
             var script = document.createElement('script');

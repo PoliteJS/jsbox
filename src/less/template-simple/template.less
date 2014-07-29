@@ -1,4 +1,5 @@
 .jsbox-tpl-simple {
+    position: relative;
     
     border: 4px solid @borderDarkColor;
     border-radius: 4px;
@@ -11,24 +12,61 @@
     
     &.jsbox-enabled {}
     
-    &.jsbox-disabled {
-        border-color: fuchsia;
-    }
+    &.jsbox-disabled {}
     
     &.jsbox-active {
-        border-color: lime;
+        border-color: #0c83d4;
+        background: #c5e9ff;
     }
     
     &.jsbox-running {
+        border-color: #a29f26;
         background: #ffe200;
     }
     
     &.jsbox-passed {
         border-color: green;
+        background: #d2f2d1;
     }
 
     &.jsbox-failed {
         border-color: brown;
+        background: #ffdada;
     }
     
+}
+
+.jsbox-tpl-overlay {
+    display: none;
+}
+
+.jsbox-disabled .jsbox-tpl-overlay {
+    position: absolute;
+    top:0;
+    left:0;
+    z-index: 100;
+    
+    display: block;
+    width: 100%;
+    height: 100%;
+    
+    background: rgba(255,255,255,.8);
+    
+    p {
+        position: absolute;
+        top: 5%;
+        left: 0;
+        
+        display: block;
+        width: 100%;
+        height: 50px;
+        
+        line-height: 50px;
+        text-align: center;
+        background: #555;
+        color: #fff;
+        
+        font-size: 16pt;
+        font-weight: normal;
+    }
 }
