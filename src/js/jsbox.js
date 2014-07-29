@@ -117,6 +117,15 @@ function boxSources(box) {
 // ------------------------------------- //
 function initSandbox(box) {
     box.sandbox = box.options.engines.sandbox.create(box.options.sandbox);
+    box.sandbox.on('finish', function(scope, result) {
+        if (result === true) {
+            publish(box, 'passed', box);
+        }
+        if (result === false) {
+            publish(box, 'failed', box);
+        }
+        publish(box, 'status', box, result, scope);
+    });
 }
 
 function disposeSandbox(box) {
@@ -243,29 +252,7 @@ function disposeTestsList(box) {
 
 function initDOM(box) {
     box.el = dom.create('div', '', 'jsbox');
-    
-    // create template
     box.template = box.options.engines.template.create(box);
-    
-    // running events
-    
-    box.sandbox.on('start', function(scope) {
-        dom.removeClass(box.el, 'jsbox-passed');
-        dom.removeClass(box.el, 'jsbox-failed');
-        dom.addClass(box.el, 'jsbox-running');
-    });
-    
-    box.sandbox.on('finish', function(scope, result) {
-        dom.removeClass(box.el, 'jsbox-running');
-        if (result) {
-            dom.addClass(box.el, 'jsbox-passed');
-            publish(box, 'passed', box);
-        } else {
-            publish(box, 'failed', box);
-        }
-        publish(box, 'status', box, result, scope);
-    });
-    
 }
 
 function disposeDOM(box) {

@@ -57,6 +57,8 @@ var templateEngine = {
                 default:
                     dom.append("-- JSBox unknown template--", this.box.el);
             }
+            
+            initEvents(this.box);
         },
         dispose: function() {
             dom.empty(this.el);
@@ -82,6 +84,28 @@ var templateEngine = {
             dom.append(wrapper, target);
         });
         
+    }
+    
+    
+    /**
+     * 
+     */
+    function initEvents(box) {
+        box.sandbox.on('start', function(scope) {
+            dom.removeClass(box.el, 'jsbox-passed');
+            dom.removeClass(box.el, 'jsbox-failed');
+            dom.addClass(box.el, 'jsbox-running');
+        });
+
+        box.sandbox.on('finish', function(scope, result) {
+            dom.removeClass(box.el, 'jsbox-running');
+            if (result === true) {
+                dom.addClass(box.el, 'jsbox-passed');
+            }
+            if (result === false) {
+                dom.addClass(box.el, 'jsbox-failed');
+            }
+        });
     }
     
     

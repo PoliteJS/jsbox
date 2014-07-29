@@ -113,15 +113,18 @@ var sandboxEngine = {
         scope.document.close();
     }
     
-    
+    /**
+     * fullResult starts to be "null" because jsboxes with no tests
+     * shouldn't have any outcome class.
+     */
     function test(sandbox, scope, tests) {
-        var fullResult = true;
+        var fullResult = null;
         
         tests.forEach(function(test, index) {
             
             scope.sandboxTestResultsHandler = function(partialResult) {
                 publish(sandbox, 'test-result', test, partialResult, index, scope);
-                fullResult = fullResult && partialResult;
+                fullResult = fullResult || true && partialResult;
             };
 
             var script = document.createElement('script');
@@ -131,7 +134,6 @@ var sandboxEngine = {
         });
         
         publish(sandbox, 'finish', scope, fullResult);
-        publish(sandbox, fullResult ? 'success' : 'failure', scope);
     }
     
     

@@ -141,7 +141,6 @@
         // chained jsboxes
         // needs to understand how to dispose properly!
         if (config.next) {
-            console.log(config.next);
             var next;
             $(document).delegate(config.next, 'jsbox-ready', function(e, _next) {
                 next = _next;
@@ -155,7 +154,6 @@
         }
         
         // plugin reference and events
-        
         $this
         .addClass('jsbox-plugin-enabled')
         .after(jsbox.getEl())
