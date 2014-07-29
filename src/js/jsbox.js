@@ -43,6 +43,9 @@ var JSBox = {
         initTestsList(this);
         initDOM(this);
         
+        this.enabled = false;
+        this.active = false;
+        
         if (this.options.disabled === true) {
             this.disable();
         } else {
@@ -64,12 +67,12 @@ var JSBox = {
         return this.el;
     },
     enable: function() {
-        this.isEnabled = true;
+        this.enabled = true;
         dom.addClass(this.el, 'jsbox-enabled');
         dom.removeClass(this.el, 'jsbox-disabled');
     },
     disable: function() {
-        this.isEnabled = false;
+        this.enabled = false;
         dom.removeClass(this.el, 'jsbox-enabled');
         dom.addClass(this.el, 'jsbox-disabled');
     },
@@ -77,6 +80,7 @@ var JSBox = {
         dom.removeClass(this.el, 'jsbox-running');
         this.softReset();
         resetEditors(this);
+        publish(this, 'reset');
     },
     softReset: function() {
         this.testsList.reset();
@@ -86,6 +90,12 @@ var JSBox = {
     execute: function() {
         this.softReset();
         this.sandbox.execute(boxSources(this), this.testsList.getList());
+    },
+    isActive: function() {
+        return this.active;
+    },
+    isEnabled: function() {
+        return this.enabled;
     }
 };
 
@@ -160,6 +170,12 @@ function initEditors(box) {
         });
         box.editors[editorName].on('cmd-execute', box.execute.bind(box));
         box.editors[editorName].on('cmd-reset', box.reset.bind(box));
+        box.editors[editorName].on('focus', function() {
+            box.active = true;
+        });
+        box.editors[editorName].on('blur', function() {
+            box.active = false;
+        });
     });
 }
 

@@ -93,12 +93,18 @@ var templateEngine = {
     /**
      * Exposes JSBOX status through DOM classes 
      */
+    
     function initEvents(box) {
         
         var _activeTimer = null;
         
+        box.sandbox.on('reset', function(scope) {
+            dom.removeClass(box.el, 'jsbox-success');
+            dom.removeClass(box.el, 'jsbox-failed');
+        });
+        
         box.sandbox.on('start', function(scope) {
-            dom.removeClass(box.el, 'jsbox-passed');
+            dom.removeClass(box.el, 'jsbox-success');
             dom.removeClass(box.el, 'jsbox-failed');
             dom.addClass(box.el, 'jsbox-running');
         });
@@ -106,11 +112,20 @@ var templateEngine = {
         box.sandbox.on('finish', function(scope, result) {
             dom.removeClass(box.el, 'jsbox-running');
             if (result === true) {
-                dom.addClass(box.el, 'jsbox-passed');
+                dom.addClass(box.el, 'jsbox-success');
             }
             if (result === false) {
                 dom.addClass(box.el, 'jsbox-failed');
             }
+            
+            // remove failure classes for an active box
+            if (box.isActive()) {
+                clearTimeout(box.template._checkActiveTimer);
+                box.template._checkActiveTimer = setTimeout(function() {
+                    dom.removeClass(box.el, 'jsbox-failed');
+                }, 1500);
+            }
+            
         });
         
         for (var key in box.editors) {
