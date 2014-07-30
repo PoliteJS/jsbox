@@ -78,7 +78,7 @@ var templateEngine = {
                 
         dom.append(editors, target);
         
-        ['testsList','sandbox','logger'].forEach(function(key) {
+        ['logger','testsList','sandbox'].forEach(function(key) {
             var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);                
             dom.append(box[key].el, wrapper);
             dom.append(wrapper, target);
