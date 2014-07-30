@@ -35,9 +35,20 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
         
         clean: {
-			build: ['build'],
-            release: ['release']
+			build: ['build/dev'],
+            release: ['build/<%= pkg.version %>']
 		},
+        
+        copy: {
+            build: {
+                files: [{
+                    expand: true, 
+                    cwd: 'src/', 
+                    src: ['*.html'], 
+                    dest: 'build/dev'
+                }]
+            }
+        },
         
         uglify: {
             build: {
@@ -52,7 +63,7 @@ module.exports = function (grunt) {
                     sourceMapFilename: 'jquery.jsbox.js.map'
                 },
                 files: {
-                    'build/jquery.jsbox.js' : jsModules
+                    'build/dev/jsbox/jquery.jsbox.js' : jsModules
                 }
             },
             release: {
@@ -65,7 +76,7 @@ module.exports = function (grunt) {
                     footer: jsWrapperEnd
                 },
                 files: {
-                    'release/jquery.jsbox-<%= pkg.version %>.js' : jsModules
+                    'build/<%= pkg.version %>/jquery.jsbox-<%= pkg.version %>.js' : jsModules
                 }
             },
             'release-min': {
@@ -74,7 +85,7 @@ module.exports = function (grunt) {
                     footer: jsWrapperEnd
                 },
                 files: {
-                    'release/jquery.jsbox-<%= pkg.version %>.min.js' : jsModules
+                    'build/<%= pkg.version %>/jquery.jsbox-<%= pkg.version %>.min.js' : jsModules
                 }
             }
         },
@@ -83,16 +94,18 @@ module.exports = function (grunt) {
             build: {
                 options: {
                     sourceMap: true,
-                    sourceMapFilename: 'build/jquery.jsbox.css.map',
-                    sourceMapRootpath: '../'
+                    sourceMapFilename: 'build/dev/jsbox/jquery.jsbox.css.map',
+                    sourceMapBasepath: 'build/dev/jsbox',
+                    outputSourceFiles: true
+//                    sourceMapRootpath: '../'
                 },
                 files: {
-                    'build/jquery.jsbox.css' : 'src/less/jsbox.less'
+                    'build/dev/jsbox/jquery.jsbox.css' : 'src/less/jsbox.less'
                 }
             },
             release: {
                 files: {
-                    'release/jquery.jsbox-<%= pkg.version %>.css' : 'src/less/jsbox.less'
+                    'build/<%= pkg.version %>/jquery.jsbox-<%= pkg.version %>.css' : 'src/less/jsbox.less'
                 }
             },
             'release-min': {
@@ -101,7 +114,7 @@ module.exports = function (grunt) {
                     cleancss: true
                 },
                 files: {
-                    'release/jquery.jsbox-<%= pkg.version %>.min.css' : 'src/less/jsbox.less'
+                    'build/<%= pkg.version %>/jquery.jsbox-<%= pkg.version %>.min.css' : 'src/less/jsbox.less'
                 }
             }
         },
@@ -114,7 +127,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     src: [
-                        'build/*.js', 'build/*.css'
+                        'build/dev/jsbox/*.js', 'build/*.css'
                     ]
                 }
             },
@@ -125,7 +138,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     src: [
-                        'release/*.js', 'release/*.css'
+                        '<%= pkg.version %>/*.js', 'release/*.css'
                     ]
                 }
             }
@@ -150,6 +163,7 @@ module.exports = function (grunt) {
     
     grunt.registerTask('build', [
         'clean:build',
+        'copy:build',
         'uglify:build',
         'less:build',
         'usebanner:build'
