@@ -84,6 +84,17 @@ var templateEngine = {
             dom.append(wrapper, target);
         });
         
+        var buttons = dom.create('div', null, 'jsbox-tpl-wrapper-buttons');
+        var execBtn = dom.create('button', null, 'jsbox-cmd jsbox-cmd-execute', 'Run &raquo;');
+        var resetBtn = dom.create('button', null, 'jsbox-cmd jsbox-cmd-reset', 'Reset');
+        
+        dom.addEvent(execBtn, 'click', box.execute.bind(box));
+        dom.addEvent(resetBtn, 'click', box.reset.bind(box));
+        
+        dom.append(resetBtn, buttons);
+        dom.append(execBtn, buttons);
+        dom.append(buttons, target);
+        
         var overlay = dom.create('div', null, 'jsbox-tpl-overlay', '<p>please complete the previous exercises!</p>');
         dom.append(overlay, target);
         
