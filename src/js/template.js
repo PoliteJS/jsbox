@@ -113,7 +113,10 @@ var templateEngine = {
         
         dom.addEvent(box.el, 'click', function() {
             if (box.isEnabled()) {
-                box.setActive(true);
+                if (!box.isActive()) {
+                    box.setActive(true);
+                    dom.removeClass(box.el, 'jsbox-failed');
+                }
             }
         });
         
@@ -130,7 +133,6 @@ var templateEngine = {
         box.on('active-status-changed', function(status) {
             if (status) {
                 dom.addClass(box.el, 'jsbox-active');
-                dom.removeClass(box.el, 'jsbox-failed');
             } else {
                 dom.removeClass(box.el, 'jsbox-active');
             }
