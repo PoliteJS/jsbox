@@ -57,7 +57,7 @@
         
         <hr>
         
-        <div data-jsbox data-jsbox-next="#jsbox2">
+        <div data-jsbox data-jsbox-lock>
             <code>setTimeout(function() {console.log("this is a log");console.warn("this is a warning");console.error("this is an error");jsboxTest();}, 1000);</code>
             <ul>
                 <li>a == true</li>
@@ -67,7 +67,7 @@
         
         <hr>
         
-        <div id="jsbox2" data-jsbox>
+        <div data-jsbox>
             <pre data-html><p>foo</p></pre>
             <pre data-css>p {color:blue}</pre>
             <pre data-js>document.querySelector('p').innerHTML = 'peg';</pre>

@@ -113,6 +113,10 @@
             config.tests.push($(this).html());
         });
         
+        // chained boxes support
+        if ($el.is('[data-jsbox-lock]')) {
+            config.next = $el.attr('data-jsbox-next', 'next');
+        }
         if ($el.attr('data-jsbox-next')) {
             config.next = $el.attr('data-jsbox-next');
         }
@@ -139,19 +143,7 @@
         var jsbox = createJsbox(config);
         
         // chained jsboxes
-        // needs to understand how to dispose properly!
-        if (config.next) {
-            var next;
-            $(document).delegate(config.next, 'jsbox-ready', function(e, _next) {
-                next = _next;
-                next.setEnabled(false);
-            });
-            jsbox.on('passed', function() {
-                if (next) {
-                    next.setEnabled(true);
-                }
-            });
-        }
+        initChained(jsbox, config, $this);
         
         // plugin reference and events
         $this
@@ -160,6 +152,36 @@
         .data('jsbox', jsbox)
         .trigger('jsbox-ready', jsbox);
 
+    }
+    
+    function initChained(jsbox, config, $this) {
+        if (!config.next) {
+            return;
+        }
+        var $next, nextBox;
+
+        if (config.next === 'next') {
+            $next = $this.nextAll('[data-jsbox]').first();
+        } else {
+            $next = $(config.next);
+        }
+
+        $next.on('jsbox-ready', function(e, instance) {
+            nextBox = instance;
+            nextBox.setEnabled(false);
+        });
+
+        jsbox.on('passed', function() {
+            if (nextBox) {
+                nextBox.setEnabled(true);
+            }
+        });
+
+        jsbox.on('dispose', function() {
+            if (nextBox) {
+                nextBox.setEnabled(true);
+            }
+        });
     }
 
     /**
