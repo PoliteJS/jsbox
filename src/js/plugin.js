@@ -144,11 +144,11 @@
             var next;
             $(document).delegate(config.next, 'jsbox-ready', function(e, _next) {
                 next = _next;
-                next.disable();
+                next.setEnabled(false);
             });
             jsbox.on('passed', function() {
                 if (next) {
-                    next.enable();
+                    next.setEnabled(true);
                 }
             });
         }

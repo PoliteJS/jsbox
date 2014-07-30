@@ -43,16 +43,18 @@ var JSBox = {
         initTestsList(this);
         initDOM(this);
         
-        this.enabled = false;
-        this.active = false;
+        // status flags
+        this.__enabled = false;
+        this.__active = false;
         
         if (this.options.disabled === true) {
-            this.disable();
+            this.setEnabled(false);
         } else {
-            this.enable();
+            this.setEnabled(true);
         }
     },
     dispose: function() {
+        publish(this, 'dispose');
         disposeSandbox(this);
         disposeEditors(this);
         disposeLogger(this);
@@ -66,18 +68,33 @@ var JSBox = {
     getEl: function() {
         return this.el;
     },
-    enable: function() {
-        this.enabled = true;
-        dom.addClass(this.el, 'jsbox-enabled');
-        dom.removeClass(this.el, 'jsbox-disabled');
+    setEnabled: function(status) {
+        var self = this;
+        var oldValue = this.__enabled;
+        this.__enabled = status === true ? true : false;
+        
+        clearTimeout(this._setEnabledTimer);
+        this._setEnabledTimer = setTimeout(function() {
+            if (oldValue !== self.active) {
+                publish(self, 'enabled-status-changed', self.__enabled, oldValue);
+            }
+        }, 50);
     },
-    disable: function() {
-        this.enabled = false;
-        dom.removeClass(this.el, 'jsbox-enabled');
-        dom.addClass(this.el, 'jsbox-disabled');
+    setActive: function(status) {
+        var self = this;
+        var oldValue = this.__active;
+        this.__active = status === true ? true : false;
+        
+        clearTimeout(this._setActiveTimer);
+        this._setActiveTimer = setTimeout(function() {
+            if (oldValue !== self.active) {
+                publish(self, 'active-status-changed', self.__active, oldValue);
+            }
+        }, 50);
     },
     reset: function() {
         dom.removeClass(this.el, 'jsbox-running');
+        this.setActive(true);
         this.softReset();
         resetEditors(this);
         publish(this, 'reset');
@@ -88,14 +105,15 @@ var JSBox = {
         this.sandbox.reset();
     },
     execute: function() {
+        this.setActive(true);
         this.softReset();
         this.sandbox.execute(boxSources(this), this.testsList.getList());
     },
     isActive: function() {
-        return this.active;
+        return this.__active;
     },
     isEnabled: function() {
-        return this.enabled;
+        return this.__enabled;
     }
 };
 
@@ -125,6 +143,7 @@ function boxSources(box) {
 // ------------------------------------- //
 // ---[   I N I T   S A N D B O X   ]--- //
 // ------------------------------------- //
+
 function initSandbox(box) {
     box.sandbox = box.options.engines.sandbox.create(box.options.sandbox);
     box.sandbox.on('finish', function(scope, result) {
@@ -170,11 +189,12 @@ function initEditors(box) {
         });
         box.editors[editorName].on('cmd-execute', box.execute.bind(box));
         box.editors[editorName].on('cmd-reset', box.reset.bind(box));
+        
         box.editors[editorName].on('focus', function() {
-            box.active = true;
+            box.setActive(true);
         });
         box.editors[editorName].on('blur', function() {
-            box.active = false;
+            box.setActive(false);
         });
     });
 }
@@ -280,14 +300,39 @@ function disposeDOM(box) {
 
 
 
+/**
+ * INSTANCES REPOSITORY
+ */
+var jsboxes = [];
 
 
-
-
-
-// FACTORY METHOD
+/**
+ * FACTORY METHOD
+ */
 function createJsbox(options) {
     var instance = Object.create(JSBox);
     instance.init(options);
+    jsboxes.push(instance);
+    
+    // deactivate every "other" active box
+    instance.on('active-status-changed', function(status) {
+        if (!status) {
+            return;
+        }
+        jsboxes.filter(function(box) {
+            return box !== instance;
+        }).forEach(function(box) {
+            box.setActive(false);
+        });
+    });
+    
+    // remove the box from the repository
+    instance.on('dispose', function(box) {
+        var index = jsboxes.indexOf(instance);
+        if (index !== -1) {
+            jsboxes.splice(index, 1);
+        }
+    });
+    
     return instance;
 }

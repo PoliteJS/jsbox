@@ -69,21 +69,23 @@ var templateEngine = {
     function renderSimple(target, options, box) {
         target.classList.add('jsbox-tpl-simple');
 
+        // editors
         var editors = dom.create('div', null, 'jsbox-tpl-wrapper-editors');
         for (var key in box.editors) {
             var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);
             dom.append(box.editors[key].el, wrapper);
             dom.append(wrapper, editors);
         }
-                
         dom.append(editors, target);
         
+        // components
         ['logger','testsList','sandbox'].forEach(function(key) {
             var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);                
             dom.append(box[key].el, wrapper);
             dom.append(wrapper, target);
         });
         
+        // buttons
         var buttons = dom.create('div', null, 'jsbox-tpl-wrapper-buttons');
         var execBtn = dom.create('button', null, 'jsbox-cmd jsbox-cmd-execute', 'Run &raquo;');
         var resetBtn = dom.create('button', null, 'jsbox-cmd jsbox-cmd-reset', 'Reset');
@@ -95,9 +97,9 @@ var templateEngine = {
         dom.append(execBtn, buttons);
         dom.append(buttons, target);
         
+        // overlay
         var overlay = dom.create('div', null, 'jsbox-tpl-overlay', '<p>please complete the previous exercises!</p>');
         dom.append(overlay, target);
-        
     }
     
     
@@ -108,6 +110,25 @@ var templateEngine = {
     function initEvents(box) {
         
         var _activeTimer = null;
+        
+        box.on('enabled-status-changed', function(status) {
+            if (status) {
+                dom.addClass(box.el, 'jsbox-enabled');
+                dom.removeClass(box.el, 'jsbox-disabled');
+            } else {
+                dom.removeClass(box.el, 'jsbox-enabled');
+                dom.addClass(box.el, 'jsbox-disabled');
+            }
+        });
+        
+        box.on('active-status-changed', function(status) {
+            if (status) {
+                dom.addClass(box.el, 'jsbox-active');
+                dom.removeClass(box.el, 'jsbox-failed');
+            } else {
+                dom.removeClass(box.el, 'jsbox-active');
+            }
+        });
         
         box.sandbox.on('reset', function(scope) {
             dom.removeClass(box.el, 'jsbox-success');
@@ -135,28 +156,9 @@ var templateEngine = {
                 box.template._checkActiveTimer = setTimeout(function() {
                     dom.removeClass(box.el, 'jsbox-failed');
                 }, 1500);
-            }
-            
+            }    
         });
         
-        for (var key in box.editors) {
-            box.editors[key].on('focus', setActive);
-            box.editors[key].on('blur', setInactive);
-        }
-        
-        function setActive() {
-            clearTimeout(_activeTimer);
-            _activeTimer = setTimeout(function() {
-                dom.addClass(box.el, 'jsbox-active');
-            }, 50);
-        }
-        
-        function setInactive() {
-            clearTimeout(_activeTimer);
-            _activeTimer = setTimeout(function() {
-                dom.removeClass(box.el, 'jsbox-active');
-            }, 50);
-        }
     }
     
     
