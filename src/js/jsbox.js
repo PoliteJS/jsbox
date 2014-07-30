@@ -189,13 +189,6 @@ function initEditors(box) {
         });
         box.editors[editorName].on('cmd-execute', box.execute.bind(box));
         box.editors[editorName].on('cmd-reset', box.reset.bind(box));
-        
-        box.editors[editorName].on('focus', function() {
-            box.setActive(true);
-        });
-        box.editors[editorName].on('blur', function() {
-            box.setActive(false);
-        });
     });
 }
 

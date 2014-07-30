@@ -111,6 +111,12 @@ var templateEngine = {
         
         var _activeTimer = null;
         
+        dom.addEvent(box.el, 'click', function() {
+            if (box.isEnabled()) {
+                box.setActive(true);
+            }
+        });
+        
         box.on('enabled-status-changed', function(status) {
             if (status) {
                 dom.addClass(box.el, 'jsbox-enabled');
