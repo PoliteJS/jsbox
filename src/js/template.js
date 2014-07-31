@@ -104,7 +104,7 @@ var templateEngine = {
         dom.append(buttons, target);
         
         // overlay
-        var overlay = dom.create('div', null, 'jsbox-tpl-overlay', '<p>please complete the previous exercises!</p>');
+        var overlay = dom.create('div', null, 'jsbox-tpl-overlay', '<p>please complete the previous exercise!</p>');
         dom.append(overlay, target);
     }
     

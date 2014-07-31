@@ -142,13 +142,13 @@
         if ($tests.children().length) {
             $tests.children().each(function() {
                 config.tests.push({
-                    code: $(this).html(),
+                    code: $(this).text(),
                     label: $(this).attr('title')
                 });
             });
         } else if ($tests.length) {
             config.tests.push({
-                code: $tests.html(),
+                code: $tests.text(),
                 label: $tests.attr('title')
             });
         }
@@ -166,6 +166,7 @@
             config.autorun = true;
         }
         
+        console.log(config);
         return config;
     }
     
