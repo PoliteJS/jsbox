@@ -5,6 +5,8 @@
 var JSBoxDefaults = {
     
     disabled: false,
+    disabledMsg: 'please complete the previous exercise!',
+    
     autorun: false,
     
     // editors
@@ -152,12 +154,18 @@ function initSandbox(box) {
     box.sandbox = box.options.engines.sandbox.create(box.options.sandbox);
     box.sandbox.on('finish', function(scope, result) {
         if (result === true) {
-            publish(box, 'passed', box);
+            setTimeout(function() {
+                publish(box, 'success', box);
+            }, 0);
         }
         if (result === false) {
-            publish(box, 'failed', box);
+            setTimeout(function() {
+                publish(box, 'error', box);
+            }, 0);
         }
-        publish(box, 'status', box, result, scope);
+        setTimeout(function() {
+            publish(box, 'status', box, result, scope);
+        }, 0);
     });
 }
 

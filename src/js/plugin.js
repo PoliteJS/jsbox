@@ -126,32 +126,13 @@
             config.sandbox.styles = $el.attr('data-jsbox-styles').split(',');
         }
         
-        // tests fallback to the first "ul" tag
-        $tests = $el.find('[data-test]');
-        if (!$tests.length) {
-            $tests = $el.find('>ul').filter(function() {
-                var $this = $(this);
-                if ($this.attr('data-artifax') !== undefined || 
-                    $this.attr('data-scripts') !== undefined || 
-                    $this.attr('data-styles') !== undefined) {
-                    return false;
-                }
-                return true;
-            });
-        }
-        if ($tests.children().length) {
-            $tests.children().each(function() {
-                config.tests.push({
-                    code: $(this).text(),
-                    label: $(this).attr('title')
-                });
-            });
-        } else if ($tests.length) {
+        // tests
+        $el.find('[data-test]').each(function() {
             config.tests.push({
-                code: $tests.text(),
-                label: $tests.attr('title')
+                code: $(this).attr('data-test'),
+                label: $(this).html()
             });
-        }
+        });
         
         // chained boxes support
         if ($el.is('[data-jsbox-lock]')) {
@@ -166,9 +147,18 @@
             config.autorun = true;
         }
         
-        console.log(config);
+        // [UNSTABLE] autorun disabled message support
+        if ($el.is('[data-jsbox-disabled]')) {
+            config.disabled = true;
+            if ($el.attr('data-jsbox-disabled')) {
+                config.disabledMsg = $el.attr('data-jsbox-disabled');
+            }
+        }
+        
+        //console.log(config);
         return config;
     }
+    
     
     
     
@@ -217,7 +207,7 @@
             nextBox.setEnabled(false);
         });
 
-        jsbox.on('passed', function() {
+        jsbox.on('success', function() {
             if (nextBox) {
                 nextBox.setEnabled(true);
             }

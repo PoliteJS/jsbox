@@ -14,24 +14,36 @@
         <link rel="stylesheet" href="jsbox/jquery.jsbox.css">
         <script src="jsbox/jquery.jsbox.js"></script>
         
-        <style>body {margin: auto 10%}</style>
+        <style>body {margin: 2% 10%}</style>
     </head>
     <body>
         
         <h1>JSBox Examples</h1>
         
-        <div style="border: 2px solid brown; margin-bottom: 20px;padding:0 20px 20px 20px;">
+        <div style="border: 2px solid #218ace; margin-bottom: 20px;padding:0 20px 20px 20px;">
+                        
+            <h3>Your First JSBox!</h3>
+
             <p>
-                <b>IMPORTANT!</b><br>
-                All the exercises use the <em>JSBox developement build</em> which is not provided within the GitHub repository.
+                Try to write the necessary <em>Javascript code</em> in order to make the test to pass!
             </p>
+
             <p>
-                You need to build by running a simple instruction in your terminal:
+                When you feel ready just press the "run" button or type "Cmd + Return"!
             </p>
-            <pre style="background:#eee;padding: 10px;font-size: 14pt;">npm install && grunt</pre>
-            <p>
-                &gt; You need <em>NodeJS</em> and <em>GruntJS</em> to be installed on your computer!
-            </p>
+
+            <div data-jsbox data-jsbox-scripts="sinon">
+                <pre data-artifax>var alertSpy = sinon.spy(window, "alert");</pre>
+                <pre data-test="alertSpy.called === true">alert your name</pre>
+                <code>//alert("my name is JSBox!");
+
+/**
+ * SOLUTION:
+ * you just need to remove the 
+ * comment from the first line!
+ */</code>
+            </div>
+            
         </div>
         
         <h2>Available Examples</h2>
@@ -42,22 +54,6 @@
         </ul>
         
         <hr>
-        
-        <h2>Your First Exercise</h2>
-        
-        <p>
-            Try to write the necessary <em>Javascript Code</em> in order to make the test pass!
-        </p>
-        
-        <p>
-            When you feel ready just press the "run" button or type "Cmd + Return"!
-        </p>
-        
-        <div data-jsbox data-jsbox-scripts="sinon,chai">
-            <pre data-artifax>var alertSpy = sinon.spy(window, "alert");</pre>
-            <pre data-test title="alert your name">chai.expect(alertSpy.called).to.be.true</pre>
-            <code>//alert("my name is JSBox!");</code>
-        </div>
         
         <h2>Enable / Disable</h2>
         

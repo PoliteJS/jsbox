@@ -14,54 +14,61 @@
         <link rel="stylesheet" href="jsbox/jquery.jsbox.css">
         <script src="jsbox/jquery.jsbox.js"></script>
         
-        <style>body {margin: auto 10%}</style>
+        <style>body {margin: 2% 10%}</style>
     </head>
     <body>
         
         <h1>JSBox Concatenated Exercises</h1>
         
-        <div style="border: 2px solid brown; margin-bottom: 20px;padding:0 20px 20px 20px;">
+        <div style="border: 2px solid #218ace; margin-bottom: 20px;padding:0 20px 20px 20px;">
             <p>
-                <b>IMPORTANT!</b><br>
-                All the exercises use the <em>JSBox developement build</em> which is not provided within the GitHub repository.
+                This page contains 3 <em>Javascript</em> exercises.
             </p>
             <p>
-                You need to build by running a simple instruction in your terminal:
+                Each exercise acts like a <strong>lock for the next one</strong> until it is solved with success.
             </p>
-            <pre style="background:#eee;padding: 10px;font-size: 14pt;">npm install && grunt</pre>
+            <button onclick="$('[data-jsbox]:first').jsbox('instance').setEnabled(true)">start the first exercise!</button>
             <p>
-                &gt; You need <em>NodeJS</em> and <em>GruntJS</em> to be installed on your computer!
+                <small>(all the exercises are already solved so you just need to run them to see the chained behavior)</small>
             </p>
         </div>
         
         <h2>01. Variable Declaration</h2>
         
-        <div data-jsbox data-jsbox-lock>
+        <div data-jsbox data-jsbox-disabled="use the button above to start!" data-jsbox-lock>
             <code>var a = true;</code>
-            <pre data-test title='define a variable "a" with a true value'>a === true</pre>
+            <pre data-test="a === true">define a variable <code>a</code> with a <code>true</code> value</pre>
         </div>
-        
-        <hr>
         
         <h2>02. String Length</h2>
         <div data-jsbox data-jsbox-lock>
             <code>var a = 'JSBox';</code>
-            <ul>
-                <li title='"a" should be a "string"'>typeof a === 'string'</li>
-                <li title='"a" should be of at least 5 characters length'>a.length >= 5</li>
-            </ul>
+            <pre data-test="typeof a === 'string'"><code>a</code> should be a <code>string</code></pre>
+            <pre data-test="a.length >= 5"><code>a</code> should be of at least 5 characters <code>length</code></pre>
         </div>
-        
-        <hr>
         
         <h3>03. Use Console Log</h3>
 
-        <div data-jsbox data-jsbox-scripts="chai,sinon">
+        <div data-jsbox data-jsbox-scripts="sinon">
             <pre data-artifax>var clogSpy = sinon.spy(window.console, "log")</pre>
             <pre data-js>var name = 'jsbox';
 console.log(name);</pre>
-            <pre data-test title='use the console to log name'>chai.expect(clogSpy.withArgs(name).called).to.be.true</pre>
+            <pre data-test="clogSpy.withArgs(name).called === true">use the <code>console</code> to log the <code>name</code> variable</pre>
         </div>
+        
+        <h2>More Info Online!</h2>
+        
+        <p>
+            <a href="http://politejs.com/jsbox">http://PoliteJS/jsbox</a>
+        </p>
+        
+        <script>
+        $(document).ready(function() {
+            $('[data-jsbox]:last').jsbox('instance').on('success', function() {
+                alert("You solved all the exercises!");
+            });
+        });
+        </script>
        
     </body>
 </html>
