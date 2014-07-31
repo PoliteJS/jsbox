@@ -161,7 +161,6 @@
             config.next = $el.attr('data-jsbox-next');
         }
         
-        console.log(config);
         return config;
     }
     

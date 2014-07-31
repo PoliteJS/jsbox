@@ -16,7 +16,7 @@
         
     </head>
     <body>
-        <!--
+        
         <h1>JSBox Examples</h1>
         
         <div style="border: 2px solid brown; margin-bottom: 20px;padding:0 20px 20px 20px;">
@@ -51,33 +51,12 @@
         <p>
             When you feel ready just press the "run" button or type "Cmd + Return"!
         </p>
-        -->
         
-        <div data-jsbox></div>
-        
-        <hr>
-        
-        <div data-jsbox data-jsbox-lock>
-<!--            <code>setTimeout(function() {console.log("this is a log");console.warn("this is a warning");console.error("this is an error");jsboxTest();}, 1000);</code>-->
-            <ul>
-                <li title='define a variable named: "a"'>typeof a !== undefined</li>
-                <li title='"a" should be "true"'>a === true</li>
-            </ul>
+        <div data-jsbox data-jsbox-scripts="sinon,chai">
+            <pre data-artifax>var alertSpy = sinon.spy(window, "alert");</pre>
+            <pre data-test title="alert your name">chai.expect(alertSpy.called).to.be.true</pre>
+            <code>//alert("my name is JSBox!");</code>
         </div>
-        
-        <hr>
-        
-        <div data-jsbox>
-            <pre data-html><p>foo</p></pre>
-            <pre data-css>p {color:blue}</pre>
-            <pre data-js>document.querySelector('p').innerHTML = 'peg';</pre>
-            <div data-tests>
-                <pre>document.querySelector('p').innerHTML.length === 5</pre>
-                <pre>window.document === document</pre>
-            </div>
-        </div>
-        
-        <hr>
         
         <h2>Enable / Disable</h2>
         

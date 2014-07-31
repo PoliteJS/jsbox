@@ -188,18 +188,69 @@ var sandboxEngine = {
      */
     
     function scriptLibraryUrl(name) {
-        return name;
+        var version = '';
+        if (name.indexOf('//') !== -1 || name.indexOf('.js') !== -1) {
+            return name;
+        }
+        if (name.indexOf('@') !== -1) {
+            var tokens = name.split('@');
+            var version = tokens[1];
+            name = tokens[0];
+        }
+        
+        switch (name) {
+            case 'sinonjs':
+            case 'sinon':
+                version = version || '1.7.3';
+                name = '//cdnjs.cloudflare.com/ajax/libs/sinon.js/@@@/sinon-min.js';
+                break;
+            
+            case 'jquery':
+            case 'jq':
+            case '$':
+                version = version || '2.1.1';
+                name = '//code.jquery.com/jquery-@@@.min.js';
+                break;
+         
+            case 'underscore':
+            case '_':
+                version = version || '1.6.0';
+                name = '//cdnjs.cloudflare.com/ajax/libs/underscore.js/@@@/underscore-min.js';
+                break;
+            
+            case 'knockoutjs':
+            case 'knockout':
+            case 'ko':
+                version = version || '3.1.0';
+                name = '//cdnjs.cloudflare.com/ajax/libs/knockout/@@@/knockout-min.js';
+                break;
+            
+            case 'backbonejs':
+            case 'backbone':
+                version = version || '1.1.2';
+                name = '//cdnjs.cloudflare.com/ajax/libs/backbone.js/@@@/backbone-min.js';
+                break;
+            
+            case 'mochajs':
+            case 'mocha':
+                version = version || '1.20.1';
+                name = '//cdnjs.cloudflare.com/ajax/libs/mocha/@@@/mocha.js';
+                break;
+            
+            case 'chaijs':
+            case 'chai':
+                version = version || '1.9.1';
+                name = '//cdnjs.cloudflare.com/ajax/libs/chai/@@@/chai.min.js';
+                break;
+                
+        }
+        
+        return name.replace('@@@',version);
     }
     
     function styleLibraryUrl(name) {
         return name;
     }
-    
-    
-    
-    
-    
-    
     
     
     
