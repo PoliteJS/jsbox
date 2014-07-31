@@ -163,7 +163,7 @@ var templateEngine = {
                 clearTimeout(box.template._checkActiveTimer);
                 box.template._checkActiveTimer = setTimeout(function() {
                     dom.removeClass(box.el, 'jsbox-failed');
-                }, 1500);
+                }, 3000);
             }    
         });
         
