@@ -146,7 +146,7 @@
                     label: $(this).attr('title')
                 });
             });
-        } else {
+        } else if ($tests.length) {
             config.tests.push({
                 code: $tests.html(),
                 label: $tests.attr('title')
@@ -159,6 +159,11 @@
         }
         if ($el.attr('data-jsbox-next')) {
             config.next = $el.attr('data-jsbox-next');
+        }
+        
+        // autorun support
+        if ($el.is('[data-jsbox-autorun]')) {
+            config.autorun = true;
         }
         
         return config;

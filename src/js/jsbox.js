@@ -5,7 +5,7 @@
 var JSBoxDefaults = {
     
     disabled: false,
-    template: null,
+    autorun: false,
     
     // editors
     editors: {
@@ -51,6 +51,10 @@ var JSBox = {
             this.setEnabled(false);
         } else {
             this.setEnabled(true);
+        }
+        
+        if (this.options.autorun === true) {
+            setTimeout(this.execute.bind(this), 0);
         }
     },
     dispose: function() {
