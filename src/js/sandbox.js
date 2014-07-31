@@ -28,7 +28,10 @@ var sandboxEngine = {
 (function() {
     
     var SandboxDefaults = {
-        timeout: 10000
+        timeout: 10000,
+        artifax: [],
+        scripts: [],
+        styles: []
     };
     
     var Sandbox = {
@@ -103,11 +106,34 @@ var sandboxEngine = {
             return scope.jsboxTest;
         };
         
+        // create external CSS libraries list
+        var styles = '';
+        box.options.styles.forEach(function(style) {
+            styles += '<link rel="stylesheet" href="' + styleLibraryUrl(style) + '"></script>';
+        });
+        
+        // create external Javascript libraries list
+        var scripts = '';
+        box.options.scripts.forEach(function(script) {
+            scripts += '<script src="' + scriptLibraryUrl(script) + '"></script>';
+        });
+        
+        // create the list of artifax
+        var artifax = '';
+        box.options.artifax.forEach(function(code) {
+            artifax += '<script>try {' + code + '\n} catch(e) {}</script>';
+        });
+        
+        
+        
         scope.document.open();
         scope.document.write([
-            '<html><head><style>',
-            source.css + '\n',
-            '</style></head><body>',
+            '<html><head>',
+            styles,
+            '<style>' + source.css + '\n</style>',
+            scripts,
+            artifax,
+            '</head><body>',
             source.html + '\n',
             '<script>',
             'try {' + source.js + '\n} catch(e) {sandboxSourceErrors(e)};',
@@ -143,6 +169,36 @@ var sandboxEngine = {
         
         publish(sandbox, 'finish', scope, fullResult);
     }
+    
+    
+    
+    
+    /**
+     * External libraries name parser
+     * @TODO: it should support short names like 
+     *    "jquery", 
+     *    "jquery@2.1.1", 
+     *    "backbone", 
+     *    "$", 
+     *    "_", 
+     *    "$@2.1.1",
+     *    "name@version"
+     *
+     * or it send back the full url as it is specified
+     */
+    
+    function scriptLibraryUrl(name) {
+        return name;
+    }
+    
+    function styleLibraryUrl(name) {
+        return name;
+    }
+    
+    
+    
+    
+    
     
     
     

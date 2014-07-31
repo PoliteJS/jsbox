@@ -69,7 +69,8 @@
                 js: ''
             },
             sandbox: {
-                visible: false
+                visible: false,
+                libs: []
             },
             tests: []
         };
@@ -91,30 +92,66 @@
             config.sandbox.visible = true;
         }
         
+        $artifax = $el.find('[data-artifax]')
+        if ($artifax.length) {
+            if ($artifax.children().length) {
+                config.sandbox.artifax = [];
+                $artifax.children().each(function() {
+                    config.sandbox.artifax.push($(this).html());
+                });
+            } else {
+                config.sandbox.artifax = [$artifax.html()];
+            }
+        }
+        
+        // js source fallback to the first "code" tag
         $code = $el.find('code').filter(function() {
             var $this = $(this);
             if ($this.attr('data-html') !== undefined || 
                 $this.attr('data-css') !== undefined || 
-                $this.attr('data-js') !== undefined) {
+                $this.attr('data-js') !== undefined ||
+                $this.attr('data-artifax') !== undefined) {
                 return false;
             }
             return true;
         });
-        
         if (!$js.length && $code.length) {
             config.editors.js = $code.html();
         }
         
-        $tests = $el.find('[data-tests]');
-        if (!$tests.length) {
-            $tests = $el.find('>ul');
+        if ($el.attr('data-jsbox-scripts')) {
+            config.sandbox.scripts = $el.attr('data-jsbox-scripts').split(',');
         }
-        $tests.children().each(function() {
-            config.tests.push({
-                code: $(this).html(),
-                label: $(this).attr('title')
+        if ($el.attr('data-jsbox-styles')) {
+            config.sandbox.styles = $el.attr('data-jsbox-styles').split(',');
+        }
+        
+        // tests fallback to the first "ul" tag
+        $tests = $el.find('[data-test]');
+        if (!$tests.length) {
+            $tests = $el.find('>ul').filter(function() {
+                var $this = $(this);
+                if ($this.attr('data-artifax') !== undefined || 
+                    $this.attr('data-scripts') !== undefined || 
+                    $this.attr('data-styles') !== undefined) {
+                    return false;
+                }
+                return true;
             });
-        });
+        }
+        if ($tests.children().length) {
+            $tests.children().each(function() {
+                config.tests.push({
+                    code: $(this).html(),
+                    label: $(this).attr('title')
+                });
+            });
+        } else {
+            config.tests.push({
+                code: $tests.html(),
+                label: $tests.attr('title')
+            });
+        }
         
         // chained boxes support
         if ($el.is('[data-jsbox-lock]')) {
@@ -124,6 +161,7 @@
             config.next = $el.attr('data-jsbox-next');
         }
         
+        console.log(config);
         return config;
     }
     
