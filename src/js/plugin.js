@@ -110,7 +110,10 @@
             $tests = $el.find('>ul');
         }
         $tests.children().each(function() {
-            config.tests.push($(this).html());
+            config.tests.push({
+                code: $(this).html(),
+                label: $(this).attr('title')
+            });
         });
         
         // chained boxes support

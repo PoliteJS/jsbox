@@ -68,6 +68,12 @@ var templateEngine = {
     
     function renderSimple(target, options, box) {
         target.classList.add('jsbox-tpl-simple');
+        
+        ['testsList'].forEach(function(key) {
+            var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);                
+            dom.append(box[key].el, wrapper);
+            dom.append(wrapper, target);
+        });
 
         // editors
         var editors = dom.create('div', null, 'jsbox-tpl-wrapper-editors');
@@ -79,7 +85,7 @@ var templateEngine = {
         dom.append(editors, target);
         
         // components
-        ['logger','testsList','sandbox'].forEach(function(key) {
+        ['logger','sandbox'].forEach(function(key) {
             var wrapper = dom.create('div', null, 'jsbox-tpl-wrapper jsbox-tpl-wrapper-' + key);                
             dom.append(box[key].el, wrapper);
             dom.append(wrapper, target);

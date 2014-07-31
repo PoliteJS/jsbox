@@ -34,11 +34,11 @@ var testsListEngine = {
             dom.remove(this.el);
         },
         push: function(test) {
-            var testEl = dom.create('li', null, 'jsbox-tests-list-item', test);
+            var testEl = dom.create('li', null, 'jsbox-tests-list-item', test.label || test.code);
             dom.append(testEl, this.el);
             dom.removeClass(this.el, 'jsbox-tests-list-empty');
             this.tests.push({
-                code: test,
+                code: test.code,
                 el: testEl
             });
         },
