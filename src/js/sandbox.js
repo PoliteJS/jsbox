@@ -209,7 +209,7 @@ var sandboxEngine = {
             case 'jq':
             case '$':
                 version = version || '2.1.1';
-                name = '//code.jquery.com/jquery-@@@.min.js';
+                name = '//cdnjs.cloudflare.com/ajax/libs/jquery/@@@/jquery.min.js';
                 break;
          
             case 'underscore':
