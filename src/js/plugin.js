@@ -128,10 +128,18 @@
         
         // tests
         $el.find('[data-test]').each(function() {
-            config.tests.push({
-                code: $(this).attr('data-test'),
-                label: $(this).html()
-            });
+            if ($(this).attr('data-test').length) {
+                config.tests.push({
+                    code: $(this).attr('data-test'),
+                    label: $(this).html()
+                });
+            } else {
+                config.tests.push({
+                    code: $(this).html(),
+                    label: ''
+                });
+            }
+            
         });
         
         // chained boxes support
@@ -155,7 +163,7 @@
             }
         }
         
-        //console.log(config);
+        console.log(config);
         return config;
     }
     

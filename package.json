@@ -1,6 +1,6 @@
 {
   "name": "jsbox",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "jquery playground plugin for javascript",
   "main": "Gruntfile.js",
   "directories": {
