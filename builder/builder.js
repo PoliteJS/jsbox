@@ -108,6 +108,21 @@ var jsBoxBuilder = {
         this.scripts.push(item);
         this.scriptUrl('');
     },
+    addJQuery: function() {
+        this.scripts.push('jquery');
+    },
+    addKnockout: function() {
+        this.scripts.push('knockout');
+    },
+    addBackbone: function() {
+        this.scripts.push('backbone');
+    },
+    addUnderscore: function() {
+        this.scripts.push('underscore');
+    },
+    addSinon: function() {
+        this.scripts.push('sinon');
+    },
     addArtifax: function() {
         var artifax = this.artifaxCode();
         if (!artifax.length) {

@@ -79,9 +79,7 @@
         <div class="row">
             <div class="col-md-6">
               
-                <p>
-                    <button data-bind="click:generateCode" class="btn btn-success btn-lg btn-block">Generate JSBox</button>
-                </p>
+                
                
                 <div id="configBox" class="panel-group">
                     <!-- sources -->
@@ -97,19 +95,28 @@
                         <div id="configBox-sources" class="panel-collapse collapse in">
                             <div class="panel-body">
                                 
+                                <!-- ko ifnot:panels().length -->
+                                <p>
+                                    <small>
+                                    Choose which panels to include into the box and give them an optional default value.
+                                    </small>
+                                </p>
+                                <hr>
+                                <!-- /ko -->
+                                
                                 <h5><input id="js-panel" type="checkbox" data-bind="checked:jsPanel"> <label for="js-panel">Javascript</label></h5>
                                 <!-- ko if:jsPanel -->
-                                <textarea class="form-control" rows="5" data-bind="value:jsSource"></textarea>
+                                <textarea class="form-control" rows="5" data-bind="value:jsSource" placeholder="write here some optional default code"></textarea>
                                 <!-- /ko -->
 
                                 <h5><input id="html-panel" type="checkbox" data-bind="checked:htmlPanel"> <label for="html-panel">HTML</label></h5>
                                 <!-- ko if:htmlPanel -->
-                                <textarea class="form-control" rows="5" data-bind="value:htmlSource"></textarea>
+                                <textarea class="form-control" rows="5" data-bind="value:htmlSource" placeholder="write here some optional default code"></textarea>
                                 <!-- /ko -->
 
                                 <h5><input id="css-panel" type="checkbox" data-bind="checked:cssPanel"> <label for="css-panel">CSS</label></h5>
                                 <!-- ko if:cssPanel -->
-                                <textarea class="form-control" rows="5" data-bind="value:cssSource"></textarea>
+                                <textarea class="form-control" rows="5" data-bind="value:cssSource" placeholder="write here some optional default code"></textarea>
                                 <!-- /ko -->
                                 
                             </div>
@@ -128,9 +135,9 @@
                         <div id="configBox-options" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <ul class="list-unstyled resources-list">
-                                    <li><input type="checkbox" data-bind="checked:isAutorun"> Autorun</li>
+                                    <li><input id="option-autorun" type="checkbox" data-bind="checked:isAutorun"> <label for="option-autorun">Autorun</label></li>
                                     <li>
-                                        <input type="checkbox" data-bind="checked:isDisabled"> Start disabled
+                                        <input id="option-disabled" type="checkbox" data-bind="checked:isDisabled"> <label for="option-disabled">Start disabled</label>
                                         <!-- ko if:isDisabled -->
                                         <input type="text" data-bind="value:disabledMessage" placeholder="disabled message" class="form-control input-sm">
                                         <!-- /ko -->
@@ -151,6 +158,15 @@
                         </div>
                         <div id="configBox-styles" class="panel-collapse collapse">
                             <div class="panel-body">
+                                <!-- ko ifnot: hasStyles -->
+                                <p>
+                                    <small>
+                                        You can embed whatever CSS libraries in your JSBox by adding their url here. <br>
+                                        <strong>Add one url at time!</strong>
+                                    </small>
+                                </p>
+                                <hr>
+                                <!-- /ko -->
                                 <!-- ko if: hasStyles -->
                                 <ul class="list-unstyled resources-list" data-bind="foreach:styles">
                                     <li>
@@ -183,6 +199,21 @@
                         </div>
                         <div id="configBox-scripts" class="panel-collapse collapse">
                             <div class="panel-body">
+                                <!-- ko ifnot: hasScripts -->
+                                <p>
+                                    <small>
+                                        You can embed whatever Javascript frameworks in your JSBox by adding their url here.<br>
+                                        <strong>Add one url at time!</strong>
+                                    </small>
+                                </p>
+                                <p>
+                                    <small>
+                                        JSBox understands some <strong>famous frameworks by name</strong>, try to click on the helper labels down the 
+                                        form control!
+                                    </small>
+                                </p>
+                                <hr>
+                                <!-- /ko -->
                                 <!-- ko if: hasScripts -->
                                 <ul class="list-unstyled resources-list" data-bind="foreach:scripts">
                                     <li>
@@ -201,6 +232,11 @@
                                     </div>
                                     <button type="submit" class="btn btn-primary input-sm"><span class="glyphicon glyphicon-ok"></span></button>
                                 </form>
+                                <span class="label label-info" data-bind="click:addJQuery">jQuery</span>
+                                <span class="label label-info" data-bind="click:addKnockout">KnockoutJS</span>
+                                <span class="label label-info" data-bind="click:addBackbone">BackboneJS</span>
+                                <span class="label label-info" data-bind="click:addUnderscore">UnderscoreJS</span>
+                                <span class="label label-info" data-bind="click:addSinon">SinonJS</span>
                             </div>
                         </div>
                     </div>
@@ -216,6 +252,20 @@
                         </div>
                         <div id="configBox-artifax" class="panel-collapse collapse">
                             <div class="panel-body">
+                                <!-- ko ifnot: hasArtifax -->
+                                <p>
+                                    <small>
+                                        An <em>artifax</em> is a piece of <em>Javascript</em> which executes before the user's code in the JSBox.
+                                    </small>
+                                </p>
+                                <p>
+                                    <small>
+                                        The normal usage of artifax is to <strong>create tests utilities</strong> like SinonJS's spies: 
+                                    </small>
+                                </p>
+                                <pre>var spy = sinon.spy(window, "alert")</pre>
+                                <hr>
+                                <!-- /ko -->
                                 <!-- ko if: hasArtifax -->
                                 <ul class="list-unstyled resources-list" data-bind="foreach:artifax">
                                     <li>
@@ -249,6 +299,22 @@
                         </div>
                         <div id="configBox-tests" class="panel-collapse collapse">
                             <div class="panel-body">
+                                <!-- ko ifnot: hasTests -->
+                                <p>
+                                    <small>
+                                        Tests are the core of JSBox and allows to <strong>create front end exercises</strong> JSBox. 
+                                    </small>
+                                </p>
+                                <p>
+                                    <small>
+                                        Write into the <code>code</code> field a <strong><em>Javascript</em> truth expression</strong> which
+                                        will evaluates after user's code.<br>
+                                        If all the tests passes then the JSBox is solved and becomes green, else the status of
+                                        the JSBox turns to "failed" and a redish color is applied.
+                                    </small>
+                                </p>
+                                <hr>
+                                <!-- /ko -->
                                 <!-- ko if: hasTests -->
                                 <ul data-bind="foreach:tests" class="list-unstyled resources-list">
                                     <li>
@@ -287,7 +353,12 @@
                 </div>
                 
                     
-                    
+                <p>
+                    <button data-bind="click:generateCode" class="btn btn-success btn-lg btn-block">
+                        Generate JSBox 
+                        <span class="glyphicon glyphicon-chevron-right pull-right"></span>
+                    </button>
+                </p>
 
                     
                 
@@ -310,7 +381,10 @@
                
                 <!-- ko if:isReady -->
                 <p>
-                    <button class="btn btn-default btn-lg btn-block" data-bind="click:reset">Reset Box</button>
+                    <button class="btn btn-warning btn-lg btn-block" data-bind="click:reset">
+                        <span class="glyphicon glyphicon-chevron-left pull-left"></span>
+                        Reset This JSBox
+                    </button>
                 </p>
                 
                 <h3>Live Preview</h3>
@@ -355,7 +429,38 @@
 
             </div>
         </div>
+        <!-- // row -->
         
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <h4>About This App</h4>
+                <p>
+                    This app is build with <a href="http://knockoutjs.com/" target="_blank"><em>KnockoutJS</em></a> in less than 3 hours of work.<br>
+                    <strong><small>Is is highly experimental and the outcome is not always guarantee!</small></strong>
+                </p>
+                <p>
+                    However it demonstrates without any doubt how good is <em>KnockoutJS</em> and the <em>MVVM</em> paradigm!<br>
+                    <strong>I love it!</strong>
+                </p>
+                <p class="well">
+                    You are free to look at the source code but consider that I put no effort in code quality.<br>
+                    Only development speed was considered!
+                </p>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <h4>
+                    <a href="../" class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-chevron-left"></span></a>
+                    <small>go back to <span style="color:black">JSBox</span>'s Home Page</small>
+                </h4>
+            </div>
+        </div>
         
     </div>
     
