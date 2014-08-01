@@ -9,23 +9,20 @@
     <title>JSBox - run live JS Exercises!</title>
 
     <link rel="stylesheet" href="http://noblackmagic.com/assets/css/nobm.min.css">
+    <style>.jsbox-sandbox-runner { height:auto }</style>
 
     <!--  Icons -->
     <link rel="icon" type="image/png" href="assets/images/icons/polite.jpg" sizes="16x16">
     <link rel="icon" type="image/png" href="assets/images/icons/polite.jpg" sizes="32x32">
     <!-- // Icon -->
-    
-    
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
 
-    <!-- jQuery -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!-- Dependencies -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
 
     <!-- JSBox -->
-    <link rel="stylesheet" href="jsbox/jquery.jsbox-latest.min.css">
-    <script src="jsbox/jquery.jsbox-latest.min.js"></script>
+    <link rel="stylesheet" href="jsbox/3.0.0/jquery.jsbox-3.0.0.min.css">
+    <script src="jsbox/3.0.0/jquery.jsbox-3.0.0.min.js"></script>
     
     <!-- Social -->
     <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53bbbbe907e85e8c"></script>
@@ -63,7 +60,7 @@
             <h3>Get your JSBox!</h3>
             
             <ul>
-                <li>- <a href="https://github.com/PoliteJS/jsbox/releases/tag/v2.0.0">Download JSBox v2.0.0</a></li>
+                <li>- <a href="https://github.com/PoliteJS/jsbox/releases/tag/v3.0.0-agusta">Download JSBox v3.0.0</a></li>
                 <li>- <a href="https://github.com/PoliteJS/jsbox">Fork on GitHub</a></li>
             </ul>
             
@@ -85,35 +82,96 @@
             </section>
             
             <section>
-                <h2>
-                    <span>This is your</span> first JSBox <span>exercise!</span>
-                </h2>
+                <h2><span>Solve your first</span> JSBox Exercise</h2>
                 <p>
                     <small>
                     you need to <strong>type the Javascript code</strong> which is needed in order to fullfill the 
                     list of conditions exposed in the top section of the box.
                     </small>
                 </p>
-               
+                
+                <!-- JSBox -->
                 <div id="box1" data-jsbox>
-<code>var a = 'true';
-/* press "run" to test this code! */</code>
+<code>var a = "true";
+
+/** 
+ * press "run" to test this code! 
+ */</code>
                     <ul>
-                        <li>typeof a !== 'undefined'</li>
-                        <li>a === true</li>
+                        <li data-test="typeof a !== 'undefined'">declare a variable named <code>a</code></li>
+                        <li data-test="a === true"><code>a</code> should be <code>true</code></li>
                     </ul>
                 </div>
+                <!-- // JSBox -->
                 
                 <script>
                 $(document).ready(function() {
-                    $('#box1').jsbox('instance').on('status', function(status) {
-                        if (status) {
-                            alert('you just solved your first JSBox!');
+                    $('#box1').jsbox('instance').on('success', function(status) {
+                        if (!$(this).data('jsbox-solved')) {
+                            $(this).data('jsbox-solved', true);
+                            alert('JSBox\nyou just solved your first JSBox!');
                         }
                     });
                 });
                 </script>
                 
+            </section>
+            
+            
+            
+            
+            
+            <section>
+                <h2><span>Play in your first</span> JSBox Playground</h2>
+                <p>
+                    Sometimes you just need to play around with the <strong>three front end blocks</strong>
+                    in order to <strong>test a code snippet</strong>.
+                </p>
+                <p>
+                    <small>
+                    This playground loads <em>jQuery</em>, <em>KnockoutJS</em>, <em>BackboneJS</em>, <em>UnderscoreJS</em>
+                    libraries so you can really try to test whatever code you want!
+                    </small>
+                </p>
+                
+                <!-- JSBox Playground -->
+                <div data-jsbox data-jsbox-autorun data-jsbox-scripts="jquery,knockout,backbone,underscore">
+            <pre data-html>
+<h4>JSBox Playground...</h4>
+<button>click on me!</button></pre>
+            <pre data-css>
+* {margin:5px}
+            
+body {
+    background: #eee;
+    color: #444;
+    margin: 5%
+}</pre>
+            <pre data-js>
+$('button').on('click', function() {
+    $('<h4>IS AWESOME!!!</h4>').insertBefore($(this)).hide().slideDown();
+    $(this).fadeOut().prevAll('h4:last').slideUp();
+});</pre>
+        </div>
+                <!-- // JSBox Playground -->
+            </section>
+            
+            
+            
+            
+            <section>
+                <h2>JSBox Features</h2>
+                <ul>
+                    <li>HTML5, CSS and Javascript sandbox</li>
+                    <li>embed whatever external library for both Javascript and CSS</li>
+                    <li>run tests on the Javascript code</li>
+                    <li>great console output support</li>
+                    <li>error handling support</li>
+                    <li>run asyncronous code</li>
+                    <li>native supporto for ACE editor</li>
+                    <li>full event support for a box outcomes and usage</li>
+                    <li>fully customizable components</li>
+                </ul>
             </section>
 
         </article>
