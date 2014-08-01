@@ -1230,7 +1230,7 @@ function createJsbox(options) {
                 config.disabledMsg = $el.attr("data-jsbox-disabled");
             }
         }
-        console.log(config);
+        //        console.log(config);
         return config;
     }
     /**
