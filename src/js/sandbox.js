@@ -1,118 +1,305 @@
-var defaultSandbox = (function() {
-        
-    var sandbox = {
-        init: function(el) {
-            this.el = el;
-            _sandbox = this;
+/**
+ * Simple Text Editor Adapter
+ *
+ * INTERFACE:
+ * execute()
+ * reset()
+ *
+ * EVENTS:
+ * start
+ * finish - the code execution is done
+ * success - finish + test passed
+ * failure - finish + test failed
+ * exception - javascript execution error
+ * console - javascript console message
+ */
+
+
+/**
+ * This is the external interface which is used by JSBox to create
+ * a brand new instance. It's a factory method.
+ */
+var sandboxEngine = {
+    create: null
+};
+
+
+
+(function() {
+    
+    var SandboxDefaults = {
+        timeout: 10000,
+        artifax: [],
+        scripts: [],
+        styles: []
+    };
+    
+    var Sandbox = {
+        init: function(options) {
+            this.options = extend({}, SandboxDefaults, options || {});
+            this.el = dom.create('div', null, 'jsbox-sandbox');
+            if (options.visible === false) {
+                dom.addClass(this.el, 'jsbox-sandbox-hidden');
+            }
+            this.reset(true);
         },
-        dispose: function() {},
+        dispose: function() {
+            removeIframe(this);
+            disposePubSub(this);
+            this.el = null;
+        },
         on: function(e, cb) {
             subscribe(this, e, cb);
         },
-        reset: function() {
-            publish(this, 'reset');
-            return this;
+        execute: function(source, tests) {
+            this.reset(true);
+            execute(this, source, tests);
         },
-        run: function(source, tests, callback) {
-            var self = this;
-
-            // test for syntax error in source code
-            try {
-                var fn = new Function(source);  
-            } catch(e) {
-                publish(this, 'exception', e);
-                publish(this, 'stop');
-                return;
+        reset: function(silent) {
+            removeIframe(this);
+            createIframe(this);
+            if (silent !== true) {
+                publish(this, 'reset');
             }
-
-            var publishEvent = function() {
-                var args = Array.prototype.slice.call(arguments);
-                args.unshift(self);
-                publish.apply(null, args);
+        }
+    };
+    
+    
+    
+    
+    
+    function execute(box, source, tests) {
+        
+        var scope = box.iframe.contentWindow;
+        var async = false;
+        
+        publish(box, 'start', scope);
+        
+        source = extend({
+            js: '',
+            css: '',
+            html: ''
+        }, source);
+        
+        fakeConsole(box, scope);
+        
+        scope.sandboxSourceErrors = function(e) {
+            publish(box, 'exception', e);
+        };
+        
+        scope.jsboxTest = function() {
+            test(box, scope, tests);
+        };
+        
+        scope.jsboxSyncEnd = function() {
+            // auto detect async code
+            if (!async && source.js.indexOf('jsboxTest()') !== -1) {
+                async = true;
+            }
+            if (!async) {
+                scope.jsboxTest();
+            }
+        };
+        
+        scope.jsboxAsync = function() {
+            async = true;
+            return scope.jsboxTest;
+        };
+        
+        // create external CSS libraries list
+        var styles = '';
+        box.options.styles.forEach(function(style) {
+            styles += '<link rel="stylesheet" href="' + styleLibraryUrl(style) + '"></script>';
+        });
+        
+        // create external Javascript libraries list
+        var scripts = '';
+        box.options.scripts.forEach(function(script) {
+            scripts += '<script src="' + scriptLibraryUrl(script) + '"></script>';
+        });
+        
+        // create the list of artifax
+        var artifax = '';
+        box.options.artifax.forEach(function(code) {
+            artifax += '<script>try {' + code + '\n} catch(e) {}</script>';
+        });
+        
+        
+        
+        scope.document.open();
+        scope.document.write([
+            '<html><head>',
+            styles,
+            '<style>' + source.css + '\n</style>',
+            scripts,
+            artifax,
+            '</head><body>',
+            source.html + '\n',
+            '<script>',
+            'try {' + source.js + '\n} catch(e) {sandboxSourceErrors(e)};',
+            'jsboxSyncEnd();',
+            '</script></body></html>'
+        ].join(''));
+        scope.document.close();
+    }
+    
+    /**
+     * fullResult starts to be "null" because jsboxes with no tests
+     * shouldn't have any outcome class.
+     */
+    function test(sandbox, scope, tests) {
+        var fullResult = null;
+        
+        tests.forEach(function(test, index) {
+            
+            scope.sandboxTestResultsHandler = function(partialResult) {
+                publish(sandbox, 'test-result', test, partialResult, index, scope);
+                if (fullResult === null) {
+                    fullResult = partialResult;
+                } else {
+                    fullResult = fullResult && partialResult;
+                }
             };
 
-            // execute source and tests
-            publish(this, 'start');
-            execute(this.el, source, tests, publishEvent, function(test, index, result) {
-                publish(self, 'stop');
-                publish(self, result ? 'success' : 'failure', index, test);
-            }, callback);
+            var script = document.createElement('script');
+            script.appendChild(document.createTextNode('try {sandboxTestResultsHandler(' + test + ')} catch (e) {sandboxTestResultsHandler(false)}'));
+            scope.document.body.appendChild(script);
+
+        });
+        
+        publish(sandbox, 'finish', scope, fullResult);
+    }
+    
+    
+    
+    
+    /**
+     * External libraries name parser
+     * @TODO: it should support short names like 
+     *    "jquery", 
+     *    "jquery@2.1.1", 
+     *    "backbone", 
+     *    "$", 
+     *    "_", 
+     *    "$@2.1.1",
+     *    "name@version"
+     *
+     * or it send back the full url as it is specified
+     */
+    
+    function scriptLibraryUrl(name) {
+        var version = '';
+        if (name.indexOf('//') !== -1 || name.indexOf('.js') !== -1) {
+            return name;
         }
-    };
-
-    function execute(target, source, tests, publishEvent, testCallback, sandboxCallback) {
-
-        // one shot iframe where to run the code and tests
-        var box = document.createElement('iframe');
-        target.appendChild(box);
-
-        var async = false;
-        var scope = box.contentWindow;
-        var body = scope.document.body;
-        var source = 'try {' + source + '} catch(e) { sandboxCatchErrors(e); }';
-
-        scope.sandboxCatchErrors = function(e) {
-            publishEvent('exception', e);
-        };
-
-        scope.console = {
-            log: function() {
-                consolePublish('log', arguments);
-            },
-            warn: function() {
-                consolePublish('warn', arguments);
-            },
-            error: function() {
-                consolePublish('error', arguments);
+        if (name.indexOf('@') !== -1) {
+            var tokens = name.split('@');
+            var version = tokens[1];
+            name = tokens[0];
+        }
+        
+        switch (name) {
+            case 'sinonjs':
+            case 'sinon':
+                version = version || '1.7.3';
+                name = '//cdnjs.cloudflare.com/ajax/libs/sinon.js/@@@/sinon-min.js';
+                break;
+            
+            case 'jquery':
+            case 'jq':
+            case '$':
+                version = version || '2.1.1';
+                name = '//cdnjs.cloudflare.com/ajax/libs/jquery/@@@/jquery.min.js';
+                break;
+         
+            case 'underscore':
+            case '_':
+                version = version || '1.6.0';
+                name = '//cdnjs.cloudflare.com/ajax/libs/underscore.js/@@@/underscore-min.js';
+                break;
+            
+            case 'knockoutjs':
+            case 'knockout':
+            case 'ko':
+                version = version || '3.1.0';
+                name = '//cdnjs.cloudflare.com/ajax/libs/knockout/@@@/knockout-min.js';
+                break;
+            
+            case 'backbonejs':
+            case 'backbone':
+                version = version || '1.1.2';
+                name = '//cdnjs.cloudflare.com/ajax/libs/backbone.js/@@@/backbone-min.js';
+                break;
+            
+            case 'mochajs':
+            case 'mocha':
+                version = version || '1.20.1';
+                name = '//cdnjs.cloudflare.com/ajax/libs/mocha/@@@/mocha.js';
+                break;
+            
+            case 'chaijs':
+            case 'chai':
+                version = version || '1.9.1';
+                name = '//cdnjs.cloudflare.com/ajax/libs/chai/@@@/chai.min.js';
+                break;
+                
+        }
+        
+        return name.replace('@@@',version);
+    }
+    
+    function styleLibraryUrl(name) {
+        return name;
+    }
+    
+    
+    
+    
+    function createIframe(sandbox) {
+        sandbox.iframe = dom.create('iframe', null, 'jsbox-sandbox-runner');
+        dom.append(sandbox.iframe, sandbox.el);
+    }
+    
+    function removeIframe(sandbox) {
+        if (sandbox.iframe) {
+            dom.remove(sandbox.iframe);
+            sandbox.iframe = null;
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    // ------------------------------------- //
+    // ---[   F A K E   C O N S O L E   ]--- //
+    // ------------------------------------- //
+    
+    function fakeConsole(sandbox, scope) {
+        scope.console = {};
+        ['log','warn','error'].forEach(function(type) {
+            scope.console[type] = function() {
+                var args = Array.prototype.slice.call(arguments);
+                publish(sandbox, type, consoleLogArgs(args), args); 
+            };
+        });
+        scope.console['assert'] = function(assertion, msg) {
+            if (assertion === true) {
+                publish(sandbox, 'assertion-passed', msg); 
+            } else {
+                publish(sandbox, 'assertion-failed', msg); 
             }
         };
-
-        scope.async = function() {
-            async = true;
-            return test;
-        };
-
-        function consolePublish(event, args) {
-            var args = Array.prototype.slice.call(args);
-            publishEvent('console', event, log2string(args), args); 
-        }
-
-        function test() {
-            var _result = true;
-            tests.forEach(function(test, index) {
-                scope.sandboxTestResultsHandler = function(result) {
-                    testCallback.call(scope, test, index, result);
-                    _result = _result && result;
-                };
-                makeScriptEl('try {sandboxTestResultsHandler(' + test + ');} catch (e) {sandboxTestResultsHandler(false);}', body);
-            });
-            target.removeChild(box);
-            sandboxCallback(_result);
-        }
-
-
-        // run the source code and test
-        makeScriptEl(source, body);
-        if (!async) {
-            test()
-        }
     }
-
-    function makeScriptEl(source, target) {
-        var el = document.createElement('script');
-        el.type = 'text/javascript';
-        el.appendChild(document.createTextNode(source));
-        if (target) {
-            target.appendChild(el);
-        }
-        return el;
-    }
-
-    function log2string(args) {
-        return args.map(logItem).join(', ');
+    
+    function consoleLogArgs(args) {
+        return args.map(consoleLogArg).join(', ');
     };
 
-    function logItem(item) {
+    function consoleLogArg(item) {
+        
         switch (typeof item) {
             case 'string':
                 return '"' + item + '"';
@@ -120,10 +307,10 @@ var defaultSandbox = (function() {
                 if (Object.prototype.toString.call(item) === '[object Date]') {
                     return item.toString();
                 } else if (Array.isArray(item)) {
-                    return '[' + item.map(logItem).join(', ') + ']';
+                    return '[' + item.map(consoleLogArg).join(', ') + ']';
                 } else {
                     return '{' + Object.keys(item).map(function(key) {
-                        return key + ':' + logItem(item[key]);
+                        return key + ':' + consoleLogArg(item[key]);
                     }).join(', ') + '}';
                 }
             case 'function':
@@ -133,7 +320,19 @@ var defaultSandbox = (function() {
         }
         return item;
     }
-
-    return sandbox;
+    
+    
+    
+    
+    
+    
+    
+    
+    // Factory Method
+    sandboxEngine.create = function(options) {
+        var instance = Object.create(Sandbox);
+        instance.init(options);
+        return instance;
+    };
 
 })();

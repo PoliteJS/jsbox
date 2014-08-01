@@ -9,11 +9,17 @@ module.exports = function (grunt) {
     
     
     var jsModules = [
-        'src/js/pubsub.js',
-        'src/js/editor.js',
+        'src/js/utils/extend.js',
+        'src/js/utils/pubsub.js',
+        'src/js/utils/dom.js',
+        'src/js/editor-text.js',
+        'src/js/editor-ace.js',
         'src/js/sandbox.js',
+        'src/js/logger.js',
+        'src/js/tests-list.js',
+        'src/js/template.js',
         'src/js/jsbox.js',
-        'src/js/plugin.js',
+        'src/js/plugin.js'
     ];
     
     var jsWrapperStart = grunt.file.read('src/js/wrapper-start.js');
@@ -29,9 +35,25 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
         
         clean: {
-			build: ['build'],
-            release: ['release']
+			build: ['build/dev'],
+            release: ['build/<%= pkg.version %>']
 		},
+        
+        copy: {
+            build: {
+                files: [{
+                    expand: true, 
+                    cwd: 'src/', 
+                    src: ['*.html'], 
+                    dest: 'build/dev'
+                },{
+                    expand: true, 
+                    cwd: 'src/extra/', 
+                    src: ['**/*'], 
+                    dest: 'build/dev/extra'
+                }]
+            }
+        },
         
         uglify: {
             build: {
@@ -46,7 +68,7 @@ module.exports = function (grunt) {
                     sourceMapFilename: 'jquery.jsbox.js.map'
                 },
                 files: {
-                    'build/jquery.jsbox.js' : jsModules
+                    'build/dev/jsbox/jquery.jsbox.js' : jsModules
                 }
             },
             release: {
@@ -59,7 +81,7 @@ module.exports = function (grunt) {
                     footer: jsWrapperEnd
                 },
                 files: {
-                    'release/jquery.jsbox-<%= pkg.version %>.js' : jsModules
+                    'build/<%= pkg.version %>/jquery.jsbox-<%= pkg.version %>.js' : jsModules
                 }
             },
             'release-min': {
@@ -68,7 +90,7 @@ module.exports = function (grunt) {
                     footer: jsWrapperEnd
                 },
                 files: {
-                    'release/jquery.jsbox-<%= pkg.version %>.min.js' : jsModules
+                    'build/<%= pkg.version %>/jquery.jsbox-<%= pkg.version %>.min.js' : jsModules
                 }
             }
         },
@@ -77,16 +99,18 @@ module.exports = function (grunt) {
             build: {
                 options: {
                     sourceMap: true,
-                    sourceMapFilename: 'build/jquery.jsbox.css.map',
-                    sourceMapRootpath: '../'
+                    sourceMapFilename: 'build/dev/jsbox/jquery.jsbox.css.map',
+                    sourceMapBasepath: 'build/dev/jsbox',
+                    outputSourceFiles: true
+//                    sourceMapRootpath: '../'
                 },
                 files: {
-                    'build/jquery.jsbox.css' : 'src/less/jsbox.less'
+                    'build/dev/jsbox/jquery.jsbox.css' : 'src/less/jsbox.less'
                 }
             },
             release: {
                 files: {
-                    'release/jquery.jsbox-<%= pkg.version %>.css' : 'src/less/jsbox.less'
+                    'build/<%= pkg.version %>/jquery.jsbox-<%= pkg.version %>.css' : 'src/less/jsbox.less'
                 }
             },
             'release-min': {
@@ -95,7 +119,7 @@ module.exports = function (grunt) {
                     cleancss: true
                 },
                 files: {
-                    'release/jquery.jsbox-<%= pkg.version %>.min.css' : 'src/less/jsbox.less'
+                    'build/<%= pkg.version %>/jquery.jsbox-<%= pkg.version %>.min.css' : 'src/less/jsbox.less'
                 }
             }
         },
@@ -108,7 +132,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     src: [
-                        'build/*.js', 'build/*.css'
+                        'build/dev/jsbox/*.js', 'build/*.css'
                     ]
                 }
             },
@@ -119,7 +143,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     src: [
-                        'release/*.js', 'release/*.css'
+                        '<%= pkg.version %>/*.js', 'release/*.css'
                     ]
                 }
             }
@@ -144,6 +168,7 @@ module.exports = function (grunt) {
     
     grunt.registerTask('build', [
         'clean:build',
+        'copy:build',
         'uglify:build',
         'less:build',
         'usebanner:build'

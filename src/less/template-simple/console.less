@@ -1,0 +1,55 @@
+.jsbox-logger {
+    display: block;
+    margin: 5px;
+    padding:0;
+    list-style-position: inside;
+    list-style-type: none;
+    list-style: none;
+    background: #fff;
+    border-left: 6px solid #333;
+    font-family: monospace;
+    font-size:.8em;
+}
+
+.jsbox-logger-item {
+    padding: 5px;
+}
+
+.jsbox-logger-item-log {
+    color: lighten(@borderDarkColor, 10%);
+}
+
+.jsbox-logger-item-warn {
+    color: #baa500;
+    &:before {
+        content: '@ ';
+    }
+}
+
+.jsbox-logger-item-error {
+    color: #aa0202;
+    &:before {
+        content: '! ';
+    }
+}
+
+.jsbox-logger-item-assertion-passed {
+    color: green;
+    &:before {
+        content: 'PASSED: ';
+    }
+}
+
+.jsbox-logger-item-assertion-failed {
+    color: #aa0202;
+    font-weight: bold;
+    &:before {
+        content: 'FAILED: ';
+    }
+}
+
+.jsbox-logger-item-exception {
+    background: #aa0202;
+    color: #fff;
+    padding: 5px;
+}

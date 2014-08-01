@@ -30,9 +30,7 @@ then you can run the following command:
         <code>a = 'foo';</code>
         
         <!-- [optional] a list of tests you want to run -->
-        <ul>
-            <li>a === 'foo';</li>
-        </ul>
+        <code data-test=>a === 'foo'</code>
     </div>
     
     <!-- JS (put it at the bottom of your page) -->

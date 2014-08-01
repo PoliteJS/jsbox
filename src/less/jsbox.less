@@ -8,7 +8,18 @@
  */
 
 
+@colorEnabled: #555;
+@colorActive: #508DDD;
+@colorRunning: #FEBE09;
+@colorSuccess: #02C833;
+@colorFailed: #FF6054;
 
+@borderRadius: 3px;
+
+
+@fontSize: 11pt;
+@fontFamily: sans-serif;
+@borderDarkColor: #555;
 
 /**
  * Import Libraries
@@ -22,10 +33,10 @@
  * Import Modules
  */
 
-@import "modules/widget.less";
-@import "modules/overlay.less";
-@import "modules/editor.less";
-@import "modules/tests.less";
-@import "modules/console.less";
-@import "modules/sandbox.less";
-@import "modules/exception.less";
+.jsbox {}
+
+.jsbox-plugin-enabled {
+    display: none;
+}
+
+@import "template-simple/template.less";

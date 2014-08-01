@@ -1,168 +1,343 @@
+/**
+ * JSBox
+ */
+
+var JSBoxDefaults = {
+    
+    disabled: false,
+    disabledMsg: 'please complete the previous exercise!',
+    
+    autorun: false,
+    
+    // editors
+    editors: {
+        html: false,
+        css: false,
+        js: ''
+    },
+    
+    // tests list
+    tests: [],
+    
+    sandbox: {
+        visible: false
+    },
+    
+    // adapter injection
+    engines: {
+        editor: window.ace ? aceEditorEngine : textEditorEngine,
+        sandbox: sandboxEngine,
+        logger: loggerEngine,
+        testsList: testsListEngine,
+        template: templateEngine
+    }
+    
+};
+
 var JSBox = {
-    init: function(el, config) {
-        this.el = el;
-        this.$el = $(this.el);
-        this.config = config;
-        this.status = false;
-
-        this.source = '';
-        loadSourceCode(this);
-
-        this.tests = [];
-        loadTestCode(this);
-
-        initDOM(this);
-        initEditor(this);
+    init: function(options) {
+        this.options = extend({}, JSBoxDefaults, options || {});
+        this.editors = {};
+        
         initSandbox(this);
+        initEditors(this);
+        initLogger(this);
+        initTestsList(this);
+        initDOM(this);
+        
+        // status flags
+        this.__enabled = false;
+        this.__active = false;
+        
+        if (this.options.disabled === true) {
+            this.setEnabled(false);
+        } else {
+            this.setEnabled(true);
+        }
+        
+        if (this.options.autorun === true) {
+            setTimeout(this.execute.bind(this), 0);
+        }
     },
     dispose: function() {
-        disposeDOM(this);
-        disposeEditor(this);
+        publish(this, 'dispose');
         disposeSandbox(this);
+        disposeEditors(this);
+        disposeLogger(this);
+        disposeTestsList(this);
+        disposeDOM(this);
+        disposePubSub(this);
     },
     on: function(event, handler) {
         subscribe(this, event, handler);
     },
-    enable: function() {
-        this.$el.removeClass('jsbox-disabled');
+    getEl: function() {
+        return this.el;
     },
-    disable: function() {
-        this.$el.addClass('jsbox-disabled');
+    setEnabled: function(status) {
+        var self = this;
+        var oldValue = this.__enabled;
+        this.__enabled = status === true ? true : false;
+        
+        clearTimeout(this._setEnabledTimer);
+        this._setEnabledTimer = setTimeout(function() {
+            if (oldValue !== self.active) {
+                publish(self, 'enabled-status-changed', self.__enabled, oldValue);
+            }
+        }, 50);
     },
-    setSource: function(source) {
-        this.source = source;
-        this.editor.setSource(this.source);
+    setActive: function(status) {
+        var self = this;
+        var oldValue = this.__active;
+        this.__active = status === true ? true : false;
+        
+        clearTimeout(this._setActiveTimer);
+        this._setActiveTimer = setTimeout(function() {
+            if (oldValue !== self.active) {
+                publish(self, 'active-status-changed', self.__active, oldValue);
+            }
+        }, 50);
     },
     reset: function() {
-        this.sandbox.reset();
-        this.setSource(this._originalSource);
+        dom.removeClass(this.el, 'jsbox-running');
+        this.setActive(true);
+        this.softReset();
+        resetEditors(this);
+        publish(this, 'reset');
     },
-    run: function() {
-        var self = this;
-        this.status = false;
-        this.sandbox.reset().run(this.source, this.tests, function(result) {
-            self.status = result;
-            publish(self, 'status', self.status);
-        });
+    softReset: function() {
+        this.testsList.reset();
+        this.logger.reset();
+        this.sandbox.reset();
+    },
+    execute: function() {
+        this.setActive(true);
+        this.softReset();
+        this.sandbox.execute(boxSources(this), this.testsList.getList());
+    },
+    isActive: function() {
+        return this.__active;
+    },
+    isEnabled: function() {
+        return this.__enabled;
     }
 };
 
-function loadSourceCode(box) {
-    if (!box.config.code && box.config.codeQuery) {
-        box.source = box.$el.find(box.config.codeQuery).text();
-    } else {
-        box.source = box.config.code;
-    }
-    box._originalSource = box.source;
-};
-
-function loadTestCode(box) {
-    if (!box.config.tests.length && box.config.testsQuery) {
-        box.tests = []
-        box.$el.find(box.config.testsQuery).each(function() {
-            box.tests.push($(this).text());
-        });
-    } else {
-        box.tests = box.config.tests;
-    }
-};
-
-// DOM
-function initDOM(box) {
-    box._originalHTML = box.$el.html();
-    box.$el.empty().addClass('jsbox-widget');
-
-    box.$editor = $('<div class="jsbox-editor">');
-
-    box.$tests = $('<ul class="jsbox-test">');
-    box.tests.forEach(function(test) {
-        box.$tests.append($('<li>').text(test));
+function boxSources(box) {
+    var sources = {};
+    Object.keys(box.editors).forEach(function(editorName) {
+        sources[editorName] = box.editors[editorName].getSource();
     });
-
-    box.$sandbox = $('<div class="jsbox-sandbox">');
-    box.$exception = $('<div class="jsbox-exception">');
-    box.$console = $('<ul class="jsbox-console">');
-
-    box.$runBtn = $('<button>').text('run');
-    box.$resetBtn = $('<button>').text('reset');
-
-    box.$runBtn.on('click', box.run.bind(box));
-    box.$resetBtn.on('click', box.reset.bind(box));
-
-    box.$overlay = $('<div class="jsbox-overlay">');
-    box.$overlay.append('<p>solve the previous exercise to unlock!</p>');
-
-    // place items into a template???
-    box.$el
-        .append(box.$tests)
-        .append(box.$editor)
-        .append(box.$sandbox)
-        .append(box.$exception)
-        .append(box.$console)
-        .append(box.$runBtn)
-        .append(box.$resetBtn)
-        .append(box.$overlay);
+    return sources;
 }
 
-function disposeDOM(box) {
-    box.$runBtn.off();
-    box.$resetBtn.off();
-    box.$el
-        .empty()
-        .removeClass('jsbox-widget')
-        .html(box._originalHTML);
-}
 
-// EDITOR
-function initEditor(box) {
-    var editor = box.config.editor || defaultEditor;
-    box.editor = Object.create(editor);
-    box.editor.init(box.$editor, box.setSource.bind(box), box.source, box.config.updateDelay);
-    box.editor.on('cmd-run', box.run.bind(box));
-    box.editor.on('cmd-reset', box.reset.bind(box));
-}
 
-function disposeEditor(box) {
-    box.editor.dispose();
-    box.editor = null;
-}
 
-// TEST RUNNER
+
+
+
+
+
+
+
+
+
+
+
+
+// ------------------------------------- //
+// ---[   I N I T   S A N D B O X   ]--- //
+// ------------------------------------- //
+
 function initSandbox(box) {
-    var sandbox = box.config.sandbox || defaultSandbox;
-    box.sandbox = Object.create(sandbox);
-    box.sandbox.init(box.$sandbox[0]);
-
-    box.sandbox.on('start', function(index) {
-        box.$tests.addClass('running');
+    box.sandbox = box.options.engines.sandbox.create(box.options.sandbox);
+    box.sandbox.on('finish', function(scope, result) {
+        if (result === true) {
+            setTimeout(function() {
+                publish(box, 'success', box);
+            }, 0);
+        }
+        if (result === false) {
+            setTimeout(function() {
+                publish(box, 'error', box);
+            }, 0);
+        }
+        setTimeout(function() {
+            publish(box, 'status', box, result, scope);
+        }, 0);
     });
-    box.sandbox.on('stop', function(index) {
-        box.$tests.removeClass('running');
-    });
-    box.sandbox.on('success', function(index) {
-        box.$tests.find(':eq(' + index + ')').addClass('success');
-    });
-    box.sandbox.on('failure', function(index) {
-        box.$tests.find(':eq(' + index + ')').addClass('failure');
-    });
-    box.sandbox.on('reset', function() {
-        box.$exception.html('').hide();
-        box.$console.html('').hide();
-        box.$tests.find('.success').removeClass('success');
-        box.$tests.find('.failure').removeClass('failure');
-    });
-    box.sandbox.on('exception', function(e) {
-        box.$exception.html(e.message).show();
-    });
-    box.sandbox.on('console', function(evt, log) {
-        $('<li>').addClass(evt).text(log).appendTo(box.$console);
-        box.$console.show();
-    });
-
-    box.sandbox.reset();
 }
 
 function disposeSandbox(box) {
     box.sandbox.dispose();
-    box.sandbox = null;
+}
+
+
+
+
+
+
+
+
+
+
+// ------------------------------------- //
+// ---[   I N I T   E D I T O R S   ]--- //
+// ------------------------------------- //
+
+function initEditors(box) {
+    Object.keys(box.options.editors).forEach(function(editorName) {
+        if (box.options.editors[editorName] === false) {
+            return;
+        }
+        var source = '';
+        if (typeof box.options.editors[editorName] === 'string') {
+            source = box.options.editors[editorName];
+        }
+        box.editors[editorName] = box.options.engines.editor.create({
+            language: editorName,
+            source: source
+        });
+        box.editors[editorName].on('cmd-execute', box.execute.bind(box));
+        box.editors[editorName].on('cmd-reset', box.reset.bind(box));
+    });
+}
+
+function disposeEditors(box) {
+    Object.keys(box.editors).forEach(function(editorName) {
+        box.editors[editorName].dispose();
+    });
+    box.editors = null;
+}
+
+function resetEditors(box) {
+    Object.keys(box.editors).forEach(function(editorName) {
+        box.editors[editorName].reset();
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ----------------------------------- //
+// ---[   I N I T   L O G G E R   ]--- //
+// ----------------------------------- //
+
+function initLogger(box) {
+    box.logger = box.options.engines.logger.create();
+    
+    ['log', 'warn', 'error', 'assertion-passed', 'assertion-failed'].forEach(function(type) {
+        box.sandbox.on(type, function(message) {
+            box.logger.push(type, message);
+        });
+    });
+    
+    box.sandbox.on('exception', function(e) {
+        box.logger.push('exception', e.message);
+    });
+    
+}
+
+function disposeLogger(box) {
+    box.logger.dispose();
+}
+
+
+
+
+
+
+
+
+
+
+
+// ------------------------------------------- //
+// ---[   I N I T   T E S T S   L I S T   ]--- //
+// ------------------------------------------- //
+
+function initTestsList(box) {
+    box.testsList = box.options.engines.testsList.create(box.options.tests);
+    
+    box.sandbox.on('test-result', function(test, result) {
+        box.testsList.setStatus(test, result);
+    });
+    
+}
+
+function disposeTestsList(box) {
+    box.testsList.dispose();
+}
+
+
+
+
+
+
+
+
+
+// ----------------------------- //
+// ---[   I N I T   D O M   ]--- //
+// ----------------------------- //
+
+function initDOM(box) {
+    box.el = dom.create('div', '', 'jsbox');
+    box.template = box.options.engines.template.create(box);
+}
+
+function disposeDOM(box) {
+    box.template.dispose();
+    dom.remove(box.el);
+}
+
+
+
+
+
+/**
+ * INSTANCES REPOSITORY
+ */
+var jsboxes = [];
+
+
+/**
+ * FACTORY METHOD
+ */
+function createJsbox(options) {
+    var instance = Object.create(JSBox);
+    instance.init(options);
+    jsboxes.push(instance);
+    
+    // deactivate every "other" active box
+    instance.on('active-status-changed', function(status) {
+        if (!status) {
+            return;
+        }
+        jsboxes.filter(function(box) {
+            return box !== instance;
+        }).forEach(function(box) {
+            box.setActive(false);
+        });
+    });
+    
+    // remove the box from the repository
+    instance.on('dispose', function(box) {
+        var index = jsboxes.indexOf(instance);
+        if (index !== -1) {
+            jsboxes.splice(index, 1);
+        }
+    });
+    
+    return instance;
 }
