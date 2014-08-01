@@ -128,22 +128,22 @@ module.exports = function (grunt) {
             build: {
                 options: {
                     position: 'top',
-                    banner: '/* JSBox v<%= pkg.version %> - DEVELOPEMENT VERSION | by Marco Pegoraro | http://politejs.com/jsbox */'
+                    banner: '/* JSBox v<%= pkg.version %> - DEVELOPEMENT VERSION | by Marco Pegoraro | http://politejs.com/jsbox */\n'
                 },
                 files: {
                     src: [
-                        'build/dev/jsbox/*.js', 'build/*.css'
+                        'build/dev/jsbox/*.js', 'build/dev/jsbox/*.css'
                     ]
                 }
             },
             release: {
                 options: {
                     position: 'top',
-                    banner: '/* JSBox v<%= pkg.version %> | by Marco Pegoraro |http://politejs.com/jsbox */'
+                    banner: '/* JSBox v<%= pkg.version %> | by Marco Pegoraro | http://politejs.com/jsbox */\n'
                 },
                 files: {
                     src: [
-                        '<%= pkg.version %>/*.js', 'release/*.css'
+                        'build/<%= pkg.version %>/*.js', 'build/<%= pkg.version %>/*.css'
                     ]
                 }
             }

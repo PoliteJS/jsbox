@@ -1,4 +1,4 @@
-/* JSBox v2.0.0 | by Marco Pegoraro |http://politejs.com/jsbox */
+/* JSBox v2.0.0 | by Marco Pegoraro | http://politejs.com/jsbox */
 
 (function($) {
     function subscribe(obj, event, cb) {
