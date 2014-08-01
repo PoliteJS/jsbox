@@ -1,0 +1,365 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <title>JSBox - Builder!</title>
+
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<!--    <style>.jsbox-sandbox-runner { height:auto }</style>-->
+
+    <!--  Icons -->
+    <link rel="icon" type="image/png" href="../assets/images/icons/polite.jpg" sizes="16x16">
+    <link rel="icon" type="image/png" href="../assets/images/icons/polite.jpg" sizes="32x32">
+    <!-- // Icon -->
+
+    <!-- Dependencies -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+
+    <!-- JSBox -->
+    <link rel="stylesheet" href="../jsbox/latest-stable/jquery.jsbox.min.css">
+    <script src="../jsbox/latest-stable/jquery.jsbox.min.js"></script>
+    
+    <!-- Social -->
+<!--    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53bbbbe907e85e8c"></script>-->
+    <!-- // Social -->
+    
+    <!-- Google Analytics -->
+<!--
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-52966127-2', 'auto');
+    ga('send', 'pageview');
+    </script>
+-->
+    
+    
+    <style>
+    .resources-list {}
+    .resources-list li {
+        padding: 5px 0;
+        border-bottom: 1px dotted #bbb;
+    }
+    .resources-list li:last-child {
+        border-bottom: none;
+    }
+    .resources-list li a {
+        float:right;
+    }
+    .resources-list li a span.glyphicon {
+        display:inline;
+        width: auto;
+        color:brown;
+    }
+    .resources-list li code {
+        color: #333;
+        background: #eee;
+    }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        
+        <div class="page-header">
+            <h1>
+                <a href="../" class="btn btn-primary" style="margin-bottom: 8px"><span class="glyphicon glyphicon-chevron-left"></span></a>
+                JSBox <small>Code Builder</small>
+            </h1>
+        </div>
+       
+        <div class="row">
+            <div class="col-md-6">
+              
+                <p>
+                    <button data-bind="click:generateCode" class="btn btn-success btn-lg btn-block">Generate JSBox</button>
+                </p>
+               
+                <div id="configBox" class="panel-group">
+                    <!-- sources -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a href="#configBox-sources" data-toggle="collapse" data-parent="#configBox">
+                                    Panels
+                                    <small data-bind="html:panels" class="pull-right"></small>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="configBox-sources" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                
+                                <h5><input id="js-panel" type="checkbox" data-bind="checked:jsPanel"> <label for="js-panel">Javascript</label></h5>
+                                <!-- ko if:jsPanel -->
+                                <textarea class="form-control" rows="5" data-bind="value:jsSource"></textarea>
+                                <!-- /ko -->
+
+                                <h5><input id="html-panel" type="checkbox" data-bind="checked:htmlPanel"> <label for="html-panel">HTML</label></h5>
+                                <!-- ko if:htmlPanel -->
+                                <textarea class="form-control" rows="5" data-bind="value:htmlSource"></textarea>
+                                <!-- /ko -->
+
+                                <h5><input id="css-panel" type="checkbox" data-bind="checked:cssPanel"> <label for="css-panel">CSS</label></h5>
+                                <!-- ko if:cssPanel -->
+                                <textarea class="form-control" rows="5" data-bind="value:cssSource"></textarea>
+                                <!-- /ko -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <!-- options -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a href="#configBox-options" data-toggle="collapse" data-parent="#configBox">
+                                    Options
+                                    <small data-bind="html:options" class="pull-right"></small>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="configBox-options" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <ul class="list-unstyled resources-list">
+                                    <li><input type="checkbox" data-bind="checked:isAutorun"> Autorun</li>
+                                    <li>
+                                        <input type="checkbox" data-bind="checked:isDisabled"> Start disabled
+                                        <!-- ko if:isDisabled -->
+                                        <input type="text" data-bind="value:disabledMessage" placeholder="disabled message" class="form-control input-sm">
+                                        <!-- /ko -->
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- css libraries -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a href="#configBox-styles" data-toggle="collapse" data-parent="#configBox">
+                                    CSS Libraries
+                                    <span class="badge pull-right" data-bind="visible:hasStyles, html:styles().length"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="configBox-styles" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <!-- ko if: hasStyles -->
+                                <ul class="list-unstyled resources-list" data-bind="foreach:styles">
+                                    <li>
+                                        <a data-bind="click:$root.removeStyle.bind($root)"><span class="glyphicon glyphicon-remove"></span></a>
+                                        <code data-bind="html:$data.substr(-50)"></code>
+                                    </li>
+                                </ul>
+                                <hr>
+                                <!-- /ko -->
+                                <form class="form-inline" data-bind="submit:addStyle">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></div>
+                                            <input data-bind="value:styleUrl"  class="form-control input-sm" type="text"placeholder="CSS Library URL" style="width:340px">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary input-sm"><span class="glyphicon glyphicon-ok"></span></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- javascript libraries -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a href="#configBox-scripts" data-toggle="collapse" data-parent="#configBox">
+                                    Javascript Libraries
+                                    <span class="badge pull-right" data-bind="visible:hasScripts, html:scripts().length"></span></a>
+                            </h4>
+                        </div>
+                        <div id="configBox-scripts" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <!-- ko if: hasScripts -->
+                                <ul class="list-unstyled resources-list" data-bind="foreach:scripts">
+                                    <li>
+                                        <a data-bind="click:$root.removeScript.bind($root)"><span class="glyphicon glyphicon-remove"></span></a>
+                                        <code data-bind="html:$data.substr(-50)"></code>
+                                    </li>
+                                </ul>
+                                <hr>
+                                <!-- /ko -->
+                                <form class="form-inline" data-bind="submit:addScript">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></div>
+                                            <input data-bind="value:scriptUrl"  class="form-control input-sm" type="text"placeholder="Javascript Library URL" style="width:340px">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary input-sm"><span class="glyphicon glyphicon-ok"></span></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- artifax -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a href="#configBox-artifax" data-toggle="collapse" data-parent="#configBox">
+                                    Artifax
+                                    <span class="badge pull-right" data-bind="visible:hasArtifax, html:artifax().length"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="configBox-artifax" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <!-- ko if: hasArtifax -->
+                                <ul class="list-unstyled resources-list" data-bind="foreach:artifax">
+                                    <li>
+                                        <a data-bind="click:$root.removeArtifax.bind($root)"><span class="glyphicon glyphicon-remove"></span></a>
+                                        <code data-bind="html:$data.substr(0,50)"></code>
+                                    </li>
+                                </ul>
+                                <hr>
+                                <!-- /ko -->
+                                <form class="form-inline" data-bind="submit:addArtifax">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></div>
+                                            <input data-bind="value:artifaxCode"  class="form-control input-sm" type="text"placeholder="artifax code" style="width:340px">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary input-sm"><span class="glyphicon glyphicon-ok"></span></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- tests -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a href="#configBox-tests" data-toggle="collapse" data-parent="#configBox">
+                                    Tests
+                                    <span class="badge pull-right" data-bind="visible:hasTests, html:tests().length"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="configBox-tests" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <!-- ko if: hasTests -->
+                                <ul data-bind="foreach:tests" class="list-unstyled resources-list">
+                                    <li>
+                                        <a data-bind="click:$root.removeTest.bind($root)"><span class="glyphicon glyphicon-remove"></span></a>
+                                        <!-- ko if: !label.length -->
+                                            <code data-bind="html:code"></code>
+                                        <!-- /ko -->
+                                        <!-- ko if: label.length -->
+                                            <span data-bind="html:label"></span><br>
+                                            <small><code data-bind="html:code"></code></small>
+                                        <!-- /ko -->
+                                    </li>
+                                </ul>
+                                <hr>
+                                <!-- /ko -->
+
+                                <form data-bind="submit:addTest" role="form">
+                                    <h4>Add New Test:</h4>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">code:</div>
+                                            <input type="text" data-bind="value:testCode" placeholder="a === true" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">label:</div>
+                                            <input type="text" data-bind="value:testLabel" placeholder="a should be true" class="form-control">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary input-sm pull-right"><span class="glyphicon glyphicon-ok"></span> add test</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                    
+                    
+
+                    
+                
+            </div>
+            <div class="col-md-6">
+               
+                <!-- ko if:showHint -->
+                <div class="well">
+                    <h4>What am I doing here?</h4>
+                    <p>
+                        This tool helps you to <strong>set up an embed JSBox</strong>.
+                    </p>
+                    <p>
+                        Use the panel on the right to <strong>fine tune your JSBox</strong> then click on 
+                        <span class="label label-success">Generate Box</span>
+                        to load a <strong>live preview</strong> here.
+                    </p>
+                </div>
+                <!-- /ko -->
+               
+                <!-- ko if:isReady -->
+                <p>
+                    <button class="btn btn-default btn-lg btn-block" data-bind="click:reset">Reset Box</button>
+                </p>
+                
+                <h3>Live Preview</h3>
+                <p>
+                    Here is a fully functional JSBox generated from the options you configured on the left hand panel.
+                </p>
+                <div data-bind="jsboxPreview:embed"></div>
+                
+                <h3>Embed Code</h3>
+                <p>
+                    Just copy/paste this code in your web page where you want the JSBox to be. <br>
+                    <small>Remember to take a look to the following section about dependencies!</small>
+                </p>
+                <p>
+                    <textarea class="form-control" rows="5" wrap="off" data-bind="value:embed, attr: {rows:embedRows}"></textarea>    
+                </p>
+                <!-- /ko -->
+                
+                <hr>
+                
+                <h3>JSBox CDN Resources</h3>
+                <p>
+                    JSBox comes as a <strong>jQuery plugin</strong> and it was testes with jQuery@2.1.1. <br>
+                    Then you can optionally include <strong>ACE Editor</strong> which enhance the user coding experience.
+                </p>
+                <p>
+                    You can even use JSBox's files from this website which is hosted on <em>GitHub Pages</em> and
+                    offers a good CDN support.
+                </p>
+                <p>
+                    <textarea class="form-control" rows="8" wrap="off" style="overflow:hidden">
+&lt;!-- Dependencies -->
+&lt;script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+&lt;script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+
+&lt;!-- JSBox -->
+&lt;link rel="stylesheet" href="//jsbox.politejs.com/jsbox/latest-stable/jquery.jsbox.min.css">
+&lt;script src="//jsbox.politejs.com/jsbox/latest-stable/jquery.jsbox.min.js"></script>
+                    </textarea>    
+                </p>
+                
+
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    
+    <script src="builder.js"></script>
+</body>
+</html>
