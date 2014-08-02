@@ -1,4 +1,4 @@
-/* JSBox v3.0.1 | by Marco Pegoraro | http://politejs.com/jsbox */
+/* JSBox v3.1.1 | by Marco Pegoraro | http://politejs.com/jsbox */
 
 
 (function() {
@@ -401,6 +401,14 @@ var sandboxEngine = {
         box.options.artifax.forEach(function(code) {
             artifax += "<script>try {" + code + "\n} catch(e) {}</script>";
         });
+        // provide access to the user generated code for static analysis pourposes
+        scope.jsbox = {
+            source: {
+                js: source.js,
+                css: source.css,
+                html: source.html
+            }
+        };
         scope.document.open();
         scope.document.write([ "<html><head>", styles, "<style>" + source.css + "\n</style>", scripts, artifax, "</head><body>", source.html + "\n", "<script>", "try {" + source.js + "\n} catch(e) {sandboxSourceErrors(e)};", "jsboxSyncEnd();", "</script></body></html>" ].join(""));
         scope.document.close();
