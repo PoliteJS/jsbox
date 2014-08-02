@@ -124,7 +124,14 @@ var sandboxEngine = {
             artifax += '<script>try {' + code + '\n} catch(e) {}</script>';
         });
         
-        
+        // provide access to the user generated code for static analysis pourposes
+        scope.jsbox = {
+            source: {
+                js: source.js,
+                css: source.css,
+                html: source.html
+            }
+        };
         
         scope.document.open();
         scope.document.write([
