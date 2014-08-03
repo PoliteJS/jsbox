@@ -4,7 +4,7 @@ var jsBoxBuilder = {
     init: function() {
         this.htmlPanel = ko.observable(false);
         this.cssPanel = ko.observable(false);
-        this.jsPanel = ko.observable(false);
+        this.jsPanel = ko.observable(true);
         this.panels = ko.computed(function() {
             var panels = [];
             if (this.htmlPanel() === true) {
@@ -63,12 +63,12 @@ var jsBoxBuilder = {
             return this.styles().length > 0 ? true : false;
         }, this);
         
-        // artifax
-        this.artifax = ko.observableArray();
-        this.hasArtifax = ko.computed(function() {
-            return this.artifax().length > 0 ? true : false;
+        // artifacts
+        this.artifacts = ko.observableArray();
+        this.hasArtifacts = ko.computed(function() {
+            return this.artifacts().length > 0 ? true : false;
         }, this);
-        this.artifaxCode = ko.observable('');
+        this.artifactCode = ko.observable('');
         
         // tests
         this.tests = ko.observableArray();
@@ -123,13 +123,13 @@ var jsBoxBuilder = {
     addSinon: function() {
         this.scripts.push('sinon');
     },
-    addArtifax: function() {
-        var artifax = this.artifaxCode();
-        if (!artifax.length) {
+    addArtifact: function() {
+        var artifact = this.artifactCode();
+        if (!artifact.length) {
             return;
         }
-        this.artifax.push(artifax);
-        this.artifaxCode('');
+        this.artifacts.push(artifact);
+        this.artifactCode('');
     },
     addTest: function() {
         var test = {
@@ -149,8 +149,8 @@ var jsBoxBuilder = {
     removeScript: function(item) {
         removeListItem(this.scripts, item);
     },
-    removeArtifax: function(item) {
-        removeListItem(this.artifax, item);
+    removeArtifact: function(item) {
+        removeListItem(this.artifacts, item);
     },
     removeTest: function(item) {
         removeListItem(this.tests, item);
@@ -163,7 +163,7 @@ var jsBoxBuilder = {
         var s = ' ';
         
         if (this.isAutorun() === true) {
-            attr += s + 'data-jsbox-autorun=true';
+            attr += s + 'data-jsbox-autorun';
         }
         
         if (this.isDisabled() === true) {
@@ -194,10 +194,10 @@ var jsBoxBuilder = {
             code += t + '<pre data-js>' + this.jsSource() + '</pre>' + ln;
         }
         
-        // artifax
-        this.artifax().forEach(function(artifaxCode) {
-            var artifax = '<pre data-artifax>' + artifaxCode + '</pre>';
-            code += t + artifax + ln;
+        // artifacts
+        this.artifacts().forEach(function(artifactCode) {
+            var artifact = '<pre data-artifact>' + artifactCode + '</pre>';
+            code += t + artifact + ln;
         });
         
         // tests

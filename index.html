@@ -130,24 +130,23 @@
                 </p>
                 <p>
                     <small>
-                    This playground loads <em>jQuery</em>, <em>KnockoutJS</em>, <em>BackboneJS</em>, <em>UnderscoreJS</em>
-                    libraries so you can really try to test whatever code you want!
+                    This playground loads <em>jQuery</em>, <em>UnderscoreJS</em>, <em>KnockoutJS</em>, <em>BackboneJS</em>
+                    libraries so you can really try to write whatever code you want!
                     </small>
                 </p>
                 
                 <!-- JSBox Playground -->
-                <div data-jsbox data-jsbox-autorun data-jsbox-scripts="jquery,knockout,backbone,underscore">
-            <pre data-html>
-<h4>JSBox Playground...</h4>
-<button>click on me!</button></pre>
-            <pre data-css>
-* {margin:5px}
-            
-body {
-    background: #eee;
-    color: #444;
-    margin: 5%
-}</pre>
+                <div 
+                    data-jsbox 
+                    data-jsbox-autorun 
+                    data-jsbox-scripts="jquery,knockout,underscore,backbone"
+                    data-jsbox-styles="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
+                >
+            <pre data-html><div class="container">
+    <h4>JSBox Playground...</h4>
+    <button class="btn btn-primary">click on me!</button>
+</div></pre>
+            <pre data-css>/* Twitter Bootstrap 3.2.0 is already embed! */</pre>
             <pre data-js>
 $('button').on('click', function() {
     $('<h4>IS AWESOME!!!</h4>').insertBefore($(this)).hide().slideDown();
@@ -165,12 +164,12 @@ $('button').on('click', function() {
                 <ul>
                     <li>HTML5, CSS and Javascript sandbox</li>
                     <li>embed whatever external library for both Javascript and CSS</li>
-                    <li>run tests on the Javascript code</li>
+                    <li>run tests on both Javascript and on the resulting page DOME</li>
                     <li>great console output support</li>
                     <li>error handling support</li>
-                    <li>run asyncronous code</li>
-                    <li>native supporto for ACE editor</li>
-                    <li>full event support for a box outcomes and usage</li>
+                    <li>run and test asyncronous code</li>
+                    <li>native support for ACE editor</li>
+                    <li>full events communication for external integrations</li>
                     <li>fully customizable components</li>
                 </ul>
             </section>

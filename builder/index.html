@@ -234,19 +234,19 @@
                             </div>
                         </div>
                     </div>
-                    <!-- artifax -->
+                    <!-- artifacts -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a href="#configBox-artifax" data-toggle="collapse" data-parent="#configBox">
                                     Artifax
-                                    <span class="badge pull-right" data-bind="visible:hasArtifax, html:artifax().length"></span>
+                                    <span class="badge pull-right" data-bind="visible:hasArtifacts, html:artifacts().length"></span>
                                 </a>
                             </h4>
                         </div>
                         <div id="configBox-artifax" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <!-- ko ifnot: hasArtifax -->
+                                <!-- ko ifnot: hasArtifacts -->
                                 <p>
                                     <small>
                                         An <em>artifax</em> is a piece of <em>Javascript</em> which executes before the user's code in the JSBox.
@@ -260,20 +260,20 @@
                                 <pre>var spy = sinon.spy(window, "alert")</pre>
                                 <hr>
                                 <!-- /ko -->
-                                <!-- ko if: hasArtifax -->
-                                <ul class="list-unstyled resources-list" data-bind="foreach:artifax">
+                                <!-- ko if: hasArtifacts -->
+                                <ul class="list-unstyled resources-list" data-bind="foreach:artifacts">
                                     <li>
-                                        <a data-bind="click:$root.removeArtifax.bind($root)"><span class="glyphicon glyphicon-remove"></span></a>
+                                        <a data-bind="click:$root.removeArtifact.bind($root)"><span class="glyphicon glyphicon-remove"></span></a>
                                         <code data-bind="html:$data.substr(0,50)"></code>
                                     </li>
                                 </ul>
                                 <hr>
                                 <!-- /ko -->
-                                <form class="form-inline" data-bind="submit:addArtifax">
+                                <form class="form-inline" data-bind="submit:addArtifact">
                                     <div class="form-group">
                                         <div class="input-group">
                                             <div class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></div>
-                                            <input data-bind="value:artifaxCode"  class="form-control input-sm" type="text"placeholder="artifax code" style="width:340px">
+                                            <input data-bind="value:artifactCode"  class="form-control input-sm" type="text"placeholder="artifax code" style="width:340px">
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary input-sm"><span class="glyphicon glyphicon-ok"></span></button>
