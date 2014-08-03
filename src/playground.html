@@ -46,11 +46,10 @@
         <h2>Frontend Playground</h2>
         
         <div data-jsbox data-jsbox-autorun data-jsbox-scripts="jquery">
-            <pre data-html><h1>JSBox Playground!</h1>
+            <pre data-html><h4>JSBox Playground...</h4>
 <button>click on me!</button></pre>
-            <pre data-css>* {
-    margin: 5px;
-}
+           
+            <pre data-css>* {margin:5px}
             
 body {
     background: #eee;
@@ -58,7 +57,8 @@ body {
     margin: 5%
 }</pre>
             <pre data-js>$('button').on('click', function() {
-    $(this).prev().fadeOut();            
+    $('<h4>IS AWESOME!!!</h4>').insertBefore($(this)).hide().slideDown();
+    $(this).fadeOut().prevAll('h4:last').slideUp();
 });</pre>
         </div>
         

@@ -27,10 +27,10 @@ then you can run the following command:
     <div data-jsbox>
         
         <!-- [optional] code you want to show in the box -->
-        <code>a = 'foo';</code>
+        <pre data-js>a = 'foo';</pre>
         
         <!-- [optional] a list of tests you want to run -->
-        <code data-test=>a === 'foo'</code>
+        <pre data-test=>a === 'foo'</pre>
     </div>
     
     <!-- JS (put it at the bottom of your page) -->

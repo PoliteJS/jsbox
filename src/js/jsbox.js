@@ -4,24 +4,24 @@
 
 var JSBoxDefaults = {
     
+    autorun: false,
+    
     disabled: false,
     disabledMsg: 'please complete the previous exercise!',
-    
-    autorun: false,
     
     // editors
     editors: {
         html: false,
         css: false,
-        js: ''
+        js: false
     },
-    
-    // tests list
-    tests: [],
     
     sandbox: {
         visible: false
     },
+    
+    // tests list
+    tests: [],
     
     // adapter injection
     engines: {

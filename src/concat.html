@@ -50,10 +50,10 @@
         <h3>03. Use Console Log</h3>
 
         <div data-jsbox data-jsbox-scripts="sinon">
-            <pre data-artifax>var clogSpy = sinon.spy(console, "log")</pre>
+            <pre data-artifact>var clogSpy = sinon.spy(console, "log")</pre>
+            <pre data-test="clogSpy.withArgs(name).called === true">use the <code>console</code> to log the <code>name</code> variable</pre>
             <pre data-js>var name = 'jsbox';
 console.log(name);</pre>
-            <pre data-test="clogSpy.withArgs(name).called === true">use the <code>console</code> to log the <code>name</code> variable</pre>
         </div>
         
         <h2>More Info Online!</h2>
