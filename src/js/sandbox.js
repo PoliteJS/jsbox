@@ -130,6 +130,14 @@ var sandboxEngine = {
                 js: source.js,
                 css: source.css,
                 html: source.html
+            },
+            hint: function(message, show) {
+                if (typeof show !== 'boolean') {
+                    show = true;
+                }
+                if (show) {
+                    publish(box, 'hint', message); 
+                }
             }
         };
         

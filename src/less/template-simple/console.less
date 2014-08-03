@@ -53,3 +53,24 @@
     color: #fff;
     padding: 5px;
 }
+
+.jsbox-logger-item-hint {
+    @color: #e37100;
+    
+    position: relative;
+    color: @color;
+    padding-left: 30px;
+    &:before {
+        position: absolute;
+        top:50%;
+        left:5px;
+        content: 'i';
+        display: inline-block;
+        padding: 0 4px;
+        margin: -6px 5px 0 0;
+        background: @color;
+        color: contrast(@color);
+        border-radius: 10px;
+        font-weight: bold;
+    }
+}
