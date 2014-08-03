@@ -66,11 +66,13 @@
             editors: {
                 html: false,
                 css: false,
-                js: ''
+                js: false
             },
             sandbox: {
                 visible: false,
-                libs: []
+                scripts: [],
+                styles: [],
+                artifacts: []
             },
             tests: []
         };
@@ -92,20 +94,8 @@
             config.sandbox.visible = true;
         }
         
-        $artifax = $el.find('[data-artifax]')
-        if ($artifax.length) {
-            if ($artifax.children().length) {
-                config.sandbox.artifax = [];
-                $artifax.children().each(function() {
-                    config.sandbox.artifax.push($(this).html());
-                });
-            } else {
-                config.sandbox.artifax = [$artifax.html()];
-            }
-        }
-        
         // js source fallback to the first "code" tag
-        $code = $el.find('code').filter(function() {
+        $code = $el.find('>code').filter(function() {
             var $this = $(this);
             if ($this.attr('data-html') !== undefined || 
                 $this.attr('data-css') !== undefined || 
@@ -119,6 +109,8 @@
             config.editors.js = $code.html();
         }
         
+        // populate sandbox options
+        
         if ($el.attr('data-jsbox-scripts')) {
             config.sandbox.scripts = $el.attr('data-jsbox-scripts').split(',');
         }
@@ -126,7 +118,16 @@
             config.sandbox.styles = $el.attr('data-jsbox-styles').split(',');
         }
         
-        // tests
+        $el.find('[data-artifact]').each(function() {
+            if ($(this).attr('data-artifact').length) {
+                config.sandbox.artifacts.push($(this).attr('data-artifact'));
+            } else {
+                config.sandbox.artifacts.push($(this).html());
+            }
+        });
+        
+        // populate tests
+        
         $el.find('[data-test]').each(function() {
             if ($(this).attr('data-test').length) {
                 config.tests.push({
@@ -143,6 +144,7 @@
         });
         
         // chained boxes support
+        
         if ($el.is('[data-jsbox-lock]')) {
             config.next = $el.attr('data-jsbox-next', 'next');
         }
@@ -151,11 +153,13 @@
         }
         
         // autorun support
+        
         if ($el.is('[data-jsbox-autorun]')) {
             config.autorun = true;
         }
         
         // [UNSTABLE] autorun disabled message support
+        
         if ($el.is('[data-jsbox-disabled]')) {
             config.disabled = true;
             if ($el.attr('data-jsbox-disabled')) {

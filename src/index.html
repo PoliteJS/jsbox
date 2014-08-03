@@ -6,21 +6,20 @@
 
         <title>JSBox - run live JS Exercises!</title>
         
-        <!-- Dependencies -->
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+        <style>
+        body {margin: 2% 10%}
+        .hint {border: 2px solid #218ace; margin: 20px 0;padding:0 20px 20px 20px;}
+        .hint p:last-child {margin-bottom:0}
+        div[data-jsbox] {position:relative;border:3px dashed #ddd;padding:20px;border-radius:10px;overflow: hidden}
+        div[data-jsbox]:after {content:"Loading JSBox...";position: absolute;top:0;left:0;display:inline-block;width:100%;height:100%;padding-top: 20pt;background: rgba(255,255,255,.9);text-align: center;font-size: 20pt;color:#bbb;}
+        </style>
         
-        <!-- JSBox -->
-        <link rel="stylesheet" href="jsbox/jquery.jsbox.css">
-        <script src="jsbox/jquery.jsbox.js"></script>
-        
-        <style>body {margin: 2% 10%}</style>
     </head>
     <body>
         
         <h1>JSBox Examples</h1>
         
-        <div style="border: 2px solid #218ace; margin-bottom: 20px;padding:0 20px 20px 20px;">
+        <div class="hint">
                         
             <h3>Your First JSBox!</h3>
 
@@ -33,7 +32,7 @@
             </p>
             
             <div data-jsbox data-jsbox-scripts="sinon">
-                <pre data-artifax>var alertSpy = sinon.spy(window, 'alert');</pre>
+                <pre data-artifact="var alertSpy = sinon.spy(window, 'alert');"></pre>
                 <pre data-test="alertSpy.called === true"><code>alert</code> your name</pre>
                 <pre data-js>//alert("my name is JSBox!");
 
@@ -49,6 +48,7 @@
         <h2>Available Examples</h2>
         
         <ul>
+            <li><a href="hints.html">Code Hints</a></li>
             <li><a href="concat.html">Concatenated Exercises</a></li>
             <li><a href="playground.html">JS Playground</a></li>
         </ul>
@@ -65,6 +65,24 @@
         <button id="enable">Enable JSBox</button>
         <button id="disable">Disable JSBox</button>
        
+        <hr>
+        
+        <h2>More Info Online!</h2>
+        
+        <p>
+            <a href="http://politejs.com/jsbox">http://PoliteJS/jsbox</a>
+        </p>
+        
+        
+        
+        <!-- Dependencies -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+        
+        <!-- JSBox -->
+        <link rel="stylesheet" href="jsbox/jquery.jsbox.css">
+        <script src="jsbox/jquery.jsbox.js"></script>
+        
         <script>
         $('#enable').click(function() {
             $('[data-jsbox]').jsbox();
@@ -73,14 +91,6 @@
             $('[data-jsbox]').jsbox('dispose');
         });
         </script>
-        
-        <hr>
-        
-        <h2>More Info Online!</h2>
-        
-        <p>
-            <a href="http://politejs.com/jsbox">http://PoliteJS/jsbox</a>
-        </p>
        
     </body>
 </html>

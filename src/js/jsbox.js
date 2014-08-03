@@ -4,24 +4,24 @@
 
 var JSBoxDefaults = {
     
+    autorun: false,
+    
     disabled: false,
     disabledMsg: 'please complete the previous exercise!',
-    
-    autorun: false,
     
     // editors
     editors: {
         html: false,
         css: false,
-        js: ''
+        js: false
     },
-    
-    // tests list
-    tests: [],
     
     sandbox: {
         visible: false
     },
+    
+    // tests list
+    tests: [],
     
     // adapter injection
     engines: {
@@ -236,7 +236,7 @@ function resetEditors(box) {
 function initLogger(box) {
     box.logger = box.options.engines.logger.create();
     
-    ['log', 'warn', 'error', 'assertion-passed', 'assertion-failed'].forEach(function(type) {
+    ['log', 'warn', 'error', 'assertion-passed', 'assertion-failed','hint'].forEach(function(type) {
         box.sandbox.on(type, function(message) {
             box.logger.push(type, message);
         });

@@ -29,9 +29,9 @@ var sandboxEngine = {
     
     var SandboxDefaults = {
         timeout: 10000,
-        artifax: [],
         scripts: [],
-        styles: []
+        styles: [],
+        artifacts: []
     };
     
     var Sandbox = {
@@ -119,9 +119,9 @@ var sandboxEngine = {
         });
         
         // create the list of artifax
-        var artifax = '';
-        box.options.artifax.forEach(function(code) {
-            artifax += '<script>try {' + code + '\n} catch(e) {}</script>';
+        var artifacts = '';
+        box.options.artifacts.forEach(function(artifact) {
+            artifacts += '<script>try {' + artifact + '\n} catch(e) {}</script>';
         });
         
         // provide access to the user generated code for static analysis pourposes
@@ -130,6 +130,14 @@ var sandboxEngine = {
                 js: source.js,
                 css: source.css,
                 html: source.html
+            },
+            hint: function(message, show) {
+                if (typeof show !== 'boolean') {
+                    show = true;
+                }
+                if (show) {
+                    publish(box, 'hint', message); 
+                }
             }
         };
         
@@ -139,7 +147,7 @@ var sandboxEngine = {
             styles,
             '<style>' + source.css + '\n</style>',
             scripts,
-            artifax,
+            artifacts,
             '</head><body>',
             source.html + '\n',
             '<script>',
