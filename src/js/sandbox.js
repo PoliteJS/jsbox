@@ -71,7 +71,6 @@ var sandboxEngine = {
     function execute(box, source, tests) {
         
         var scope = box.iframe.contentWindow;
-        var async = false;
         
         publish(box, 'start', scope);
         
@@ -81,30 +80,10 @@ var sandboxEngine = {
             html: ''
         }, source);
         
-        fakeConsole(box, scope);
         
-        scope.sandboxSourceErrors = function(e) {
-            publish(box, 'exception', e);
-        };
+        jsboxScope(box, scope, source, tests);
+        jsboxConsole(box, scope);
         
-        scope.jsboxTest = function() {
-            test(box, scope, tests);
-        };
-        
-        scope.jsboxSyncEnd = function() {
-            // auto detect async code
-            if (!async && source.js.indexOf('jsboxTest()') !== -1) {
-                async = true;
-            }
-            if (!async) {
-                scope.jsboxTest();
-            }
-        };
-        
-        scope.jsboxAsync = function() {
-            async = true;
-            return scope.jsboxTest;
-        };
         
         // create external CSS libraries list
         var styles = '';
@@ -124,22 +103,7 @@ var sandboxEngine = {
             artifacts += '<script>try {' + artifact + '\n} catch(e) {}</script>';
         });
         
-        // provide access to the user generated code for static analysis pourposes
-        scope.jsbox = {
-            source: {
-                js: source.js,
-                css: source.css,
-                html: source.html
-            },
-            hint: function(message, show) {
-                if (typeof show !== 'boolean') {
-                    show = true;
-                }
-                if (show) {
-                    publish(box, 'hint', message); 
-                }
-            }
-        };
+        
         
         scope.document.open();
         scope.document.write([
@@ -151,8 +115,8 @@ var sandboxEngine = {
             '</head><body>',
             source.html + '\n',
             '<script>',
-            'try {' + source.js + '\n} catch(e) {sandboxSourceErrors(e)};',
-            'jsboxSyncEnd();',
+            'try {' + source.js + '\n} catch(e) {jsbox.sandboxSourceErrors(e)};',
+            'jsbox.syncEnd();',
             '</script></body></html>'
         ].join(''));
         scope.document.close();
@@ -183,6 +147,49 @@ var sandboxEngine = {
         });
         
         publish(sandbox, 'finish', scope, fullResult);
+    }
+    
+    
+    
+    /**
+     * create the "jsbox" object into the sandbox's execution scope.
+     */
+    function jsboxScope(sanbox, scope, source, tests) {
+        var async = false;
+        scope.jsbox = {
+            source: {
+                js: source.js,
+                css: source.css,
+                html: source.html
+            },
+            hint: function(message, show) {
+                if (typeof show !== 'boolean') {
+                    show = true;
+                }
+                if (show) {
+                    publish(sanbox, 'hint', message); 
+                }
+            },
+            sandboxSourceErrors: function(e) {
+                publish(sanbox, 'exception', e);
+            },
+            test: function() {
+                test(sanbox, scope, tests);
+            },
+            syncEnd: function() {
+                // auto detect async code
+                if (!async && source.js.indexOf('jsbox.test') !== -1) {
+                    async = true;
+                }
+                if (!async) {
+                    scope.jsbox.test();
+                }
+            },
+            async: function() {
+                async = true;
+                return scope.test;
+            }
+        };
     }
     
     
@@ -288,11 +295,17 @@ var sandboxEngine = {
     
     
     
-    // ------------------------------------- //
-    // ---[   F A K E   C O N S O L E   ]--- //
-    // ------------------------------------- //
     
-    function fakeConsole(sandbox, scope) {
+    
+    
+    
+    
+    
+    // --------------------------------------- //
+    // ---[   J S B O X   C O N S O L E   ]--- //
+    // --------------------------------------- //
+    
+    function jsboxConsole(sandbox, scope) {
         scope.console = {};
         ['log','warn','error'].forEach(function(type) {
             scope.console[type] = function() {

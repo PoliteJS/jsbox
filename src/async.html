@@ -18,51 +18,44 @@
     </head>
     <body>
         
-        <h1>JSBox Code Hints Example</h1>
+        <h1>JSBox Async Example</h1>
         
         <div class="hint">
                         
-            <h3>Why code hints?!</h3>
+            <h3>Runnin Async Code?!</h3>
 
             <p>
-                Code hints are a good method to help the user solving complicated tests.
+                The power of Javascript is into the <strong>asynchronous code execution</strong> and the <strong>events loop</strong>.<br>
+                <small>-- Almost everybody know that!</small>
             </p>
 
             <p>
-                A test can be made of many conditions and you may want to give suggestions when only
-                a part of the test fails.
+                You can run whatever asyn code you may need, when you're done just invoke the test runner to trigger 
+                JSBox post execution logic:
             </p>
             
-            <pre class="code">jsbox.hint('hint message', truthCondition);</pre>
-            
-            <p>
-                Hint's message is shown only when the <code>truthCondition</code> is <code>true</code>!
-            </p>
+            <pre class="code">jsbox.test();</pre>
             
         </div>
         
         <h2>Try it you self:</h2>
         
-        <ol>
-            <li>run the box without any code</li>
-            <li>try to write <code>b = 1;</code></li>
-            <li>try to write <code>a = 1;</code></li>
-            <li>try to write <code>var a = 1;</code></li>
-        </ol>
-        
         <!-- JSBox -->
         <div data-jsbox>
+            <pre data-artifact="
+                window.__testStartTimer = new Date();
+                jsbox.hint('When you run some async code you must call to <code>jsbox.test()</code> when you task is done!', jsbox.source.js.indexOf('jsbox.test') === -1);
+            "></pre>
             <pre data-test="(function() {
-                var t1 = jsbox.source.js.length > 0;
-                var t2 = 'a' in window;
-                var t3 = jsbox.source.js.indexOf('var') !== -1;
-
-                jsbox.hint('you may need to <b>write some javascript</b> if you want to complete this exercise!', !t1);
-                jsbox.hint('javascript can\'t see any <code>a</code> variable, did you create it?', t1 && !t2);
-                jsbox.hint('it is always better to <b>explicitly define a variable</b> with the <code>var</code> operator!', t1 && t2 && !t3);
-
+                window.__testStopTimer = new Date();
+                var executionTime = window.__testStopTimer.getTime() - window.__testStartTimer.getTime();
+                var t1 = 'a' in window && a === 'jsbox';
+                var t2 = executionTime >= 1000;
+                
+                jsbox.hint('the timing function is not correct,<br>take a look to <code>setTimeout()</code>!', !t2);
+                
                 return t1 && t2;
-            })()">create a variable named <code>a</code></pre>
+            })()">put the string <code>jsbox</code> into a variable named <code>a</code> after 1s</pre>
             <pre data-js></pre>
         </div>
         <!-- // JSBox -->
@@ -71,6 +64,14 @@
             <p>
                 Take a look at the source of this page to see how this JSBox was built!
             </p>
+            <p>
+                However the correct solution to the above exercise is:
+            </p>
+            <pre class="code">var a;
+setTimeout(function() {
+    a = 'jsbox';
+    jsbox.test();
+}, 1000);</pre>
         </div>
         
         <h2>More Info Online!</h2>
