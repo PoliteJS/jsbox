@@ -1,4 +1,4 @@
-/* JSBox v3.2.0 | by Marco Pegoraro | http://politejs.com/jsbox */
+/* JSBox v3.2.1 | by Marco Pegoraro | http://politejs.com/jsbox */
 
 
 (function() {
@@ -382,8 +382,19 @@ var sandboxEngine = {
         box.options.artifacts.forEach(function(artifact) {
             artifacts += "<script>try {" + artifact + "\n} catch(e) {}</script>";
         });
+        // ChaiJS Integration
+        var supportChaiJS = [ "<script>", "if(window.chai){", "window.expect=window.chai.expect;", "window.should=window.chai.should;", "window.assert=window.chai.assert;", "}</script>" ].join("");
+        // heavvy syntax errors handler
+        // this timeout is cleared in `jsbox.syncEnd`
+        box.codeErrorTimeout = setTimeout(function() {
+            scope.document.write("");
+            publish(box, "exception", {
+                message: "<b>Check your Javascript!</b><br>it contains a really bad syntax error!"
+            });
+            publish(box, "finish", scope, false);
+        }, 1e3);
         scope.document.open();
-        scope.document.write([ "<html><head>", styles, "<style>" + source.css + "\n</style>", scripts, artifacts, "</head><body>", source.html + "\n", "<script>", "try {" + source.js + "\n} catch(e) {jsbox.sandboxSourceErrors(e)};", "jsbox.syncEnd();", "</script></body></html>" ].join(""));
+        scope.document.write([ "<html><head>", styles, "<style>" + source.css + "\n</style>", scripts, supportChaiJS, artifacts, "</head><body>", source.html + "\n", "<script>", "try {" + source.js + "\n} catch(e) {jsbox.sandboxSourceErrors(e)};", "jsbox.syncEnd();", "</script></body></html>" ].join(""));
         scope.document.close();
     }
     /**
@@ -393,7 +404,11 @@ var sandboxEngine = {
     function test(sandbox, scope, tests) {
         var fullResult = null;
         tests.forEach(function(test, index) {
-            scope.sandboxTestResultsHandler = function(partialResult) {
+            scope.sandboxTestResultsHandler = function(partialResult, e) {
+                // handle ChaiJS exceptions
+                if (e && scope.chai && e instanceof scope.chai.AssertionError) {
+                    publish(sandbox, "chai-exception", e);
+                }
                 publish(sandbox, "test-result", test, partialResult, index, scope);
                 if (fullResult === null) {
                     fullResult = partialResult;
@@ -402,7 +417,7 @@ var sandboxEngine = {
                 }
             };
             var script = document.createElement("script");
-            script.appendChild(document.createTextNode("try {sandboxTestResultsHandler(" + test + ")} catch (e) {sandboxTestResultsHandler(false)}"));
+            script.appendChild(document.createTextNode("try {sandboxTestResultsHandler(" + test + ")} catch (e) {sandboxTestResultsHandler(false, e)}"));
             scope.document.body.appendChild(script);
         });
         publish(sandbox, "finish", scope, fullResult);
@@ -410,7 +425,7 @@ var sandboxEngine = {
     /**
      * create the "jsbox" object into the sandbox's execution scope.
      */
-    function jsboxScope(sanbox, scope, source, tests) {
+    function jsboxScope(sandbox, scope, source, tests) {
         var async = false;
         scope.jsbox = {
             source: {
@@ -423,16 +438,18 @@ var sandboxEngine = {
                     show = true;
                 }
                 if (show) {
-                    publish(sanbox, "hint", message);
+                    publish(sandbox, "hint", message);
                 }
             },
             sandboxSourceErrors: function(e) {
-                publish(sanbox, "exception", e);
+                publish(sandbox, "exception", e);
             },
             test: function() {
-                test(sanbox, scope, tests);
+                test(sandbox, scope, tests);
             },
             syncEnd: function() {
+                // clear bad errors handling timer
+                clearTimeout(sandbox.codeErrorTimeout);
                 // auto detect async code
                 if (!async && source.js.indexOf("jsbox.test") !== -1) {
                     async = true;
@@ -765,7 +782,7 @@ var templateEngine = {
     };
     function renderSimple(target, options, box) {
         target.classList.add("jsbox-tpl-simple");
-        [ "testsList" ].forEach(function(key) {
+        [ "testsList", "systemLogger" ].forEach(function(key) {
             var wrapper = dom.create("div", null, "jsbox-tpl-wrapper jsbox-tpl-wrapper-" + key);
             dom.append(box[key].el, wrapper);
             dom.append(wrapper, target);
@@ -779,7 +796,7 @@ var templateEngine = {
         }
         dom.append(editors, target);
         // components
-        [ "logger", "sandbox" ].forEach(function(key) {
+        [ "userLogger", "sandbox" ].forEach(function(key) {
             var wrapper = dom.create("div", null, "jsbox-tpl-wrapper jsbox-tpl-wrapper-" + key);
             dom.append(box[key].el, wrapper);
             dom.append(wrapper, target);
@@ -894,7 +911,8 @@ var JSBox = {
         this.editors = {};
         initSandbox(this);
         initEditors(this);
-        initLogger(this);
+        initSystemLogger(this);
+        initUserLogger(this);
         initTestsList(this);
         initDOM(this);
         // status flags
@@ -913,7 +931,8 @@ var JSBox = {
         publish(this, "dispose");
         disposeSandbox(this);
         disposeEditors(this);
-        disposeLogger(this);
+        disposeSystemLogger(this);
+        disposeUserLogger(this);
         disposeTestsList(this);
         disposeDOM(this);
         disposePubSub(this);
@@ -955,7 +974,8 @@ var JSBox = {
     },
     softReset: function() {
         this.testsList.reset();
-        this.logger.reset();
+        this.systemLogger.reset();
+        this.userLogger.reset();
         this.sandbox.reset();
     },
     execute: function() {
@@ -1042,20 +1062,33 @@ function resetEditors(box) {
 // ----------------------------------- //
 // ---[   I N I T   L O G G E R   ]--- //
 // ----------------------------------- //
-function initLogger(box) {
-    box.logger = box.options.engines.logger.create();
-    [ "log", "warn", "error", "assertion-passed", "assertion-failed", "hint" ].forEach(function(type) {
+function initUserLogger(box) {
+    box.userLogger = box.options.engines.logger.create();
+    [ "log", "warn", "error", "assertion-passed", "assertion-failed" ].forEach(function(type) {
         box.sandbox.on(type, function(message) {
-            box.logger.push(type, message);
+            box.userLogger.push(type, message);
         });
     });
     box.sandbox.on("exception", function(e) {
-        box.logger.push("exception", e.message);
+        box.userLogger.push("exception", e.message);
     });
 }
 
-function disposeLogger(box) {
-    box.logger.dispose();
+function disposeUserLogger(box) {
+    box.userLogger.dispose();
+}
+
+function initSystemLogger(box) {
+    box.systemLogger = box.options.engines.logger.create();
+    [ "hint" ].forEach(function(type) {
+        box.sandbox.on(type, function(message) {
+            box.systemLogger.push(type, message);
+        });
+    });
+}
+
+function disposeSystemLogger(box) {
+    box.systemLogger.dispose();
 }
 
 // ------------------------------------------- //
