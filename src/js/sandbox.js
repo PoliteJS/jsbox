@@ -113,24 +113,36 @@ var sandboxEngine = {
             '}</script>'
         ].join('');
         
+        // let "start" message to propagate before the execution
+        // of some heavy synchronous code from some newbie!
+        setTimeout(function() {
         
-        
-        scope.document.open();
-        scope.document.write([
-            '<html><head>',
-            styles,
-            '<style>' + source.css + '\n</style>',
-            scripts,
-            supportChaiJS,
-            artifacts,
-            '</head><body>',
-            source.html + '\n',
-            '<script>',
-            'try {' + source.js + '\n} catch(e) {jsbox.sandboxSourceErrors(e)};',
-            'jsbox.syncEnd();',
-            '</script></body></html>'
-        ].join(''));
-        scope.document.close();
+            // heavvy syntax errors handler
+            // this timeout is cleared in `jsbox.syncEnd`
+            box.codeErrorTimeout = setTimeout(function() {
+                scope.document.write('');
+                publish(box, 'exception', {message:'<b>Check your Javascript!</b><br>it contains a really bad syntax error!'});
+                publish(box, 'finish', scope, false);
+            }, 0);
+
+            scope.document.open();
+            scope.document.write([
+                '<html><head>',
+                styles,
+                '<style>' + source.css + '\n</style>',
+                scripts,
+                supportChaiJS,
+                artifacts,
+                '</head><body>',
+                source.html + '\n',
+                '<script>',
+                'try {' + source.js + '\n} catch(e) {jsbox.sandboxSourceErrors(e)};',
+                'jsbox.syncEnd();',
+                '</script></body></html>'
+            ].join(''));
+            scope.document.close();
+            
+        }, 0);
     }
     
     /**
@@ -169,7 +181,7 @@ var sandboxEngine = {
     /**
      * create the "jsbox" object into the sandbox's execution scope.
      */
-    function jsboxScope(sanbox, scope, source, tests) {
+    function jsboxScope(sandbox, scope, source, tests) {
         var async = false;
         scope.jsbox = {
             source: {
@@ -182,16 +194,18 @@ var sandboxEngine = {
                     show = true;
                 }
                 if (show) {
-                    publish(sanbox, 'hint', message); 
+                    publish(sandbox, 'hint', message); 
                 }
             },
             sandboxSourceErrors: function(e) {
-                publish(sanbox, 'exception', e);
+                publish(sandbox, 'exception', e);
             },
             test: function() {
-                test(sanbox, scope, tests);
+                test(sandbox, scope, tests);
             },
             syncEnd: function() {
+                // clear bad errors handling timer
+                clearTimeout(sandbox.codeErrorTimeout);
                 // auto detect async code
                 if (!async && source.js.indexOf('jsbox.test') !== -1) {
                     async = true;
