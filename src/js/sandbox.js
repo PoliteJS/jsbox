@@ -103,6 +103,16 @@ var sandboxEngine = {
             artifacts += '<script>try {' + artifact + '\n} catch(e) {}</script>';
         });
         
+        // ChaiJS Integration
+        var supportChaiJS = [
+            '<script>',
+            'if(window.chai){',
+                'window.expect=window.chai.expect;',
+                'window.should=window.chai.should;',
+                'window.assert=window.chai.assert;',
+            '}</script>'
+        ].join('');
+        
         
         
         scope.document.open();
@@ -111,6 +121,7 @@ var sandboxEngine = {
             styles,
             '<style>' + source.css + '\n</style>',
             scripts,
+            supportChaiJS,
             artifacts,
             '</head><body>',
             source.html + '\n',
@@ -131,7 +142,11 @@ var sandboxEngine = {
         
         tests.forEach(function(test, index) {
             
-            scope.sandboxTestResultsHandler = function(partialResult) {
+            scope.sandboxTestResultsHandler = function(partialResult, e) {
+                // handle ChaiJS exceptions
+                if (e && scope.chai && e instanceof scope.chai.AssertionError) {
+                    publish(sandbox, 'chai-exception', e);
+                }
                 publish(sandbox, 'test-result', test, partialResult, index, scope);
                 if (fullResult === null) {
                     fullResult = partialResult;
@@ -141,7 +156,7 @@ var sandboxEngine = {
             };
 
             var script = document.createElement('script');
-            script.appendChild(document.createTextNode('try {sandboxTestResultsHandler(' + test + ')} catch (e) {sandboxTestResultsHandler(false)}'));
+            script.appendChild(document.createTextNode('try {sandboxTestResultsHandler(' + test + ')} catch (e) {sandboxTestResultsHandler(false, e)}'));
             scope.document.body.appendChild(script);
 
         });
