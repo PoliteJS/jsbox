@@ -113,36 +113,32 @@ var sandboxEngine = {
             '}</script>'
         ].join('');
         
-        // let "start" message to propagate before the execution
-        // of some heavy synchronous code from some newbie!
-        setTimeout(function() {
         
-            // heavvy syntax errors handler
-            // this timeout is cleared in `jsbox.syncEnd`
-            box.codeErrorTimeout = setTimeout(function() {
-                scope.document.write('');
-                publish(box, 'exception', {message:'<b>Check your Javascript!</b><br>it contains a really bad syntax error!'});
-                publish(box, 'finish', scope, false);
-            }, 50);
+        // heavvy syntax errors handler
+        // this timeout is cleared in `jsbox.syncEnd`
+        box.codeErrorTimeout = setTimeout(function() {
+            scope.document.write('');
+            publish(box, 'exception', {message:'<b>Check your Javascript!</b><br>it contains a really bad syntax error!'});
+            publish(box, 'finish', scope, false);
+        }, 50);
 
-            scope.document.open();
-            scope.document.write([
-                '<html><head>',
-                styles,
-                '<style>' + source.css + '\n</style>',
-                scripts,
-                supportChaiJS,
-                artifacts,
-                '</head><body>',
-                source.html + '\n',
-                '<script>',
-                'try {' + source.js + '\n} catch(e) {jsbox.sandboxSourceErrors(e)};',
-                'jsbox.syncEnd();',
-                '</script></body></html>'
-            ].join(''));
-            scope.document.close();
-            
-        }, 0);
+        scope.document.open();
+        scope.document.write([
+            '<html><head>',
+            styles,
+            '<style>' + source.css + '\n</style>',
+            scripts,
+            supportChaiJS,
+            artifacts,
+            '</head><body>',
+            source.html + '\n',
+            '<script>',
+            'try {' + source.js + '\n} catch(e) {jsbox.sandboxSourceErrors(e)};',
+            'jsbox.syncEnd();',
+            '</script></body></html>'
+        ].join(''));
+        scope.document.close();
+        
     }
     
     /**

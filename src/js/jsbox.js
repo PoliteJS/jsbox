@@ -41,7 +41,8 @@ var JSBox = {
         
         initSandbox(this);
         initEditors(this);
-        initLogger(this);
+        initSystemLogger(this);
+        initUserLogger(this);
         initTestsList(this);
         initDOM(this);
         
@@ -63,7 +64,8 @@ var JSBox = {
         publish(this, 'dispose');
         disposeSandbox(this);
         disposeEditors(this);
-        disposeLogger(this);
+        disposeSystemLogger(this);
+        disposeUserLogger(this);
         disposeTestsList(this);
         disposeDOM(this);
         disposePubSub(this);
@@ -107,7 +109,8 @@ var JSBox = {
     },
     softReset: function() {
         this.testsList.reset();
-        this.logger.reset();
+        this.systemLogger.reset();
+        this.userLogger.reset();
         this.sandbox.reset();
     },
     execute: function() {
@@ -233,23 +236,38 @@ function resetEditors(box) {
 // ---[   I N I T   L O G G E R   ]--- //
 // ----------------------------------- //
 
-function initLogger(box) {
-    box.logger = box.options.engines.logger.create();
+function initUserLogger(box) {
+    box.userLogger = box.options.engines.logger.create();
     
-    ['log', 'warn', 'error', 'assertion-passed', 'assertion-failed','hint'].forEach(function(type) {
+    ['log', 'warn', 'error', 'assertion-passed', 'assertion-failed'].forEach(function(type) {
         box.sandbox.on(type, function(message) {
-            box.logger.push(type, message);
+            box.userLogger.push(type, message);
         });
     });
     
     box.sandbox.on('exception', function(e) {
-        box.logger.push('exception', e.message);
+        box.userLogger.push('exception', e.message);
     });
     
 }
 
-function disposeLogger(box) {
-    box.logger.dispose();
+function disposeUserLogger(box) {
+    box.userLogger.dispose();
+}
+
+function initSystemLogger(box) {
+    box.systemLogger = box.options.engines.logger.create();
+    
+    ['hint'].forEach(function(type) {
+        box.sandbox.on(type, function(message) {
+            box.systemLogger.push(type, message);
+        });
+    });
+    
+}
+
+function disposeSystemLogger(box) {
+    box.systemLogger.dispose();
 }
 
 
