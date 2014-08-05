@@ -392,7 +392,7 @@ var sandboxEngine = {
                 message: "<b>Check your Javascript!</b><br>it contains a really bad syntax error!"
             });
             publish(box, "finish", scope, false);
-        }, 50);
+        }, 1e3);
         scope.document.open();
         scope.document.write([ "<html><head>", styles, "<style>" + source.css + "\n</style>", scripts, supportChaiJS, artifacts, "</head><body>", source.html + "\n", "<script>", "try {" + source.js + "\n} catch(e) {jsbox.sandboxSourceErrors(e)};", "jsbox.syncEnd();", "</script></body></html>" ].join(""));
         scope.document.close();
