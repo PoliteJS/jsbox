@@ -123,7 +123,7 @@ var sandboxEngine = {
                 scope.document.write('');
                 publish(box, 'exception', {message:'<b>Check your Javascript!</b><br>it contains a really bad syntax error!'});
                 publish(box, 'finish', scope, false);
-            }, 0);
+            }, 50);
 
             scope.document.open();
             scope.document.write([
