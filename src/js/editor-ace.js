@@ -25,8 +25,10 @@ var aceEditorEngine = {
     var AceEditorDefaults = {
         language: 'txt',
         source: '',
-        sourceDelay: 0,
-        autosizeDelay: 0
+        
+        autosize: false,
+        minHeight: false,
+        maxHeight: false
     };
     
     var AceEditor = {
@@ -72,9 +74,18 @@ var aceEditorEngine = {
             this.ace.on('focus', function() {
                 publish(self, 'focus');
             });
+            
             this.ace.on('blur', function() {
                 publish(self, 'blur');
             });
+            
+            if (this.options.autosize === true) {
+                setTimeout(function() {
+                    self.ace.on('change', editorAutosize.bind(self));
+                    self.ace.resize(true);
+                    editorAutosize.call(self);
+                }, 0);
+            }
             
             this.setSource(this.options.source, true);
             
@@ -103,6 +114,18 @@ var aceEditorEngine = {
         }
     };
     
+    
+    function editorAutosize() {
+        var height = this.ace.getSession().getScreenLength() * this.ace.renderer.lineHeight + this.ace.renderer.scrollBar.getWidth();
+        if (this.options.minHeight !== false && height < this.options.minHeight) {
+            height = this.options.minHeight;
+        }
+        if (this.options.maxHeight !== false && height > this.options.maxHeight) {
+            height = this.options.maxHeight;
+        }
+        this.el.style.height = height.toString() + 'px';
+        this.ace.resize();
+    }
     
     
     // Factory Method
