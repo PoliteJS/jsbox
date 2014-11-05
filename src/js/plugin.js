@@ -167,7 +167,22 @@
             }
         }
         
-//        console.log(config);
+        // autosize
+        
+        if ($el.is('[data-autosize]')) {
+            config.editors.autosize = true;  
+            config.editors.minHeight = 50;
+        }
+        
+        if ($el.is('[data-minHeight]')) {
+            config.editors.minHeight = $el.attr('data-minHeight');
+        }
+        
+        if ($el.is('[data-maxHeight]')) {
+            config.editors.maxHeight = $el.attr('data-maxHeight');
+        }
+        
+        //console.log(config);
         return config;
     }
     
