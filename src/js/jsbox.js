@@ -190,7 +190,10 @@ function disposeSandbox(box) {
 // ------------------------------------- //
 
 function initEditors(box) {
-    Object.keys(box.options.editors).forEach(function(editorName) {
+    var supportedEditors = ['js','css','html'];
+    Object.keys(box.options.editors).filter(function(editorName) {
+        return supportedEditors.indexOf(editorName) !== -1;
+    }).forEach(function(editorName) {
         if (box.options.editors[editorName] === false) {
             return;
         }
@@ -198,10 +201,14 @@ function initEditors(box) {
         if (typeof box.options.editors[editorName] === 'string') {
             source = box.options.editors[editorName];
         }
-        box.editors[editorName] = box.options.engines.editor.create({
+        var options = {
             language: editorName,
-            source: source
-        });
+            source: source,
+            autosize: box.options.editors.autosize,
+            minHeight: box.options.editors.minHeight,
+            maxHeight: box.options.editors.maxHeight
+        };
+        box.editors[editorName] = box.options.engines.editor.create(options);
         box.editors[editorName].on('cmd-execute', box.execute.bind(box));
         box.editors[editorName].on('cmd-reset', box.reset.bind(box));
     });
