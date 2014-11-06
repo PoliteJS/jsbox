@@ -79,18 +79,19 @@
         
         $js = $el.find('[data-js]')
         if ($js.length) {
-            config.editors.js = $js.html();
+            config.editors.js = $js.text();
+            console.log(config.editors.js);
         }
         
         $css = $el.find('[data-css]')
         if ($css.length) {
-            config.editors.css = $css.html();
+            config.editors.css = $css.text();
             config.sandbox.visible = true;
         }
         
         $html = $el.find('[data-html]')
         if ($html.length) {
-            config.editors.html = $html.html();
+            config.editors.html = $html.text();
             config.sandbox.visible = true;
         }
         
