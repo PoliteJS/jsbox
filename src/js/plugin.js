@@ -91,7 +91,7 @@
         
         $html = $el.find('[data-html]')
         if ($html.length) {
-            config.editors.html = $html.text();
+            config.editors.html = $html.html();
             config.sandbox.visible = true;
         }
         
