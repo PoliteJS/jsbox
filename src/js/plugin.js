@@ -59,7 +59,6 @@
     
     
     
-    
     function buildConfig($el) {
         var $html, $css, $js, $code, $tests;
         var config = {
@@ -79,19 +78,19 @@
         
         $js = $el.find('[data-js]')
         if ($js.length) {
-            config.editors.js = $js.text();
+            config.editors.js = decodeEntities($js.html());
             console.log(config.editors.js);
         }
         
         $css = $el.find('[data-css]')
         if ($css.length) {
-            config.editors.css = $css.text();
+            config.editors.css = decodeEntities($css.html());
             config.sandbox.visible = true;
         }
         
         $html = $el.find('[data-html]')
         if ($html.length) {
-            config.editors.html = $html.html();
+            config.editors.html = $html.html().replace(/&amp;/g, '&');
             config.sandbox.visible = true;
         }
         
@@ -262,6 +261,24 @@
         $this.removeClass('jsbox-plugin-enabled')
     }
     
+    
+    
+    var decodeEntities = (function() {
+        // this prevents any overhead from creating the object each time
+        var element = document.createElement('div');
+        function decodeHTMLEntities (str) {
+            if(str && typeof str === 'string') {
+                // strip script/html tags
+                str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+                str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+                element.innerHTML = str;
+                str = element.textContent;
+                element.textContent = '';
+            }
+            return str;
+        }
+        return decodeHTMLEntities;
+    })();
 
 // jQuery Wrapper
 })(jQuery);
