@@ -79,7 +79,6 @@
         $js = $el.find('[data-js]')
         if ($js.length) {
             config.editors.js = decodeEntities($js.html());
-            console.log(config.editors.js);
         }
         
         $css = $el.find('[data-css]')
