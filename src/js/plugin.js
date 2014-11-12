@@ -78,7 +78,7 @@
         
         $js = $el.find('[data-js]')
         if ($js.length) {
-            config.editors.js = decodeEntities($js.html());
+            config.editors.js = decodeEntities($js.html().replace(/</g, '&lt;'));
         }
         
         $css = $el.find('[data-css]')
