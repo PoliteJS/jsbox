@@ -20,6 +20,19 @@ var dom = (function($) {
             }
             return $el[0];
         },
+        $create: function(tag, _id, _class, _html) {
+            var $el = $('<' + tag + '>');
+            if (_id) {
+                $el.attr('id', _id);
+            }
+            if (_class) {
+                $el.addClass(_class);
+            }
+            if (_html) {
+                $el.append(_html);
+            }
+            return $el;
+        },
         append: function(el, target) {
             $(target).append(el);
         },
