@@ -331,7 +331,9 @@ var sandboxEngine = {
     // --------------------------------------- //
     
     function jsboxConsole(sandbox, scope) {
-        scope.console = {};
+        if (!scope.console) {
+            scope.console = {};
+        }
         ['log','warn','error'].forEach(function(type) {
             scope.console[type] = function() {
                 var args = Array.prototype.slice.call(arguments);
@@ -351,27 +353,52 @@ var sandboxEngine = {
         return args.map(consoleLogArg).join(', ');
     };
 
+    function htmlEscape(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+    
     function consoleLogArg(item) {
-        
-        switch (typeof item) {
-            case 'string':
-                return '"' + item + '"';
-            case 'object':
-                if (Object.prototype.toString.call(item) === '[object Date]') {
+        var objectList = [];
+        function recursiveArgs(item, key) {
+            if (item === null) {
+                return "null";
+            }
+            if (item === undefined) {
+                return "undefined";
+            }
+            switch (typeof item) {
+                case 'string':
+                    return '"' + htmlEscape(item) + '"';
+                case 'object':
+                    if (Object.prototype.toString.call(item) === '[object Date]') {
+                        return item.toString();
+                    } else if (Array.isArray(item)) {
+                        return '[' + item.map(recursiveArgs).join(', ') + ']';
+                    } else {
+                        if (objectList.indexOf(item) === -1) {
+                            objectList.push(item);
+                            return '{' + Object.keys(item).map(function(key) {
+                                return key + ':' + recursiveArgs(item[key], key);
+                            }).join(', ') + '}';
+                        } else {
+                            return typeof item;
+                        }
+                    }
+                case 'function':
                     return item.toString();
-                } else if (Array.isArray(item)) {
-                    return '[' + item.map(consoleLogArg).join(', ') + ']';
-                } else {
-                    return '{' + Object.keys(item).map(function(key) {
-                        return key + ':' + consoleLogArg(item[key]);
-                    }).join(', ') + '}';
-                }
-            case 'function':
-                return item.toString();
-            case 'boolean':
-                return item.toString().toUpperCase();
+                case 'boolean':
+                    return item.toString().toUpperCase();
+            }
+            
+            return item;
         }
-        return item;
+        
+        return recursiveArgs(item);
     }
     
     
