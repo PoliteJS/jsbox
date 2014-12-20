@@ -21,6 +21,11 @@ function FullScreenCmd(options, channel) {
 	$el.on(this.options.event, function FullScreenCmd__eventHandler() {
 		self.channel.emit('cmd:fullScreen');
 	});
+
+	this.dispose = function() {
+		$el.off();
+		$el.remove();
+	};
 	
 }
 

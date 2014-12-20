@@ -21,6 +21,11 @@ function ResetCmd(options, channel) {
 	$el.on(this.options.event, function ResetCmd__eventHandler() {
 		self.channel.emit('cmd:reset');
 	});
+
+	this.dispose = function() {
+		$el.off();
+		$el.remove();
+	};
 	
 }
 

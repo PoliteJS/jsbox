@@ -80,8 +80,7 @@ exports.data = {
 		html: null,
 		css: null,
 		js: null,
-		console: null,
-		output: null
+		console: null
 	},
 	commands: {
 		run: null,

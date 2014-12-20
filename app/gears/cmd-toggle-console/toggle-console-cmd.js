@@ -22,6 +22,11 @@ function ToggleConsoleCmd(options, channel) {
 		self.channel.emit('cmd:toggleConsole');
 	});
 	
+	this.dispose = function() {
+		$el.off();
+		$el.remove();
+	};
+	
 }
 
 module.exports = ToggleConsoleCmd;

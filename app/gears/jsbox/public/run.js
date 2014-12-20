@@ -12,7 +12,6 @@ function JSBox__run() {
 		css: getEditorContent.call(this, 'css'),
 		js: getEditorContent.call(this, 'js')
 	});
-
 }
 
 module.exports = JSBox__run;

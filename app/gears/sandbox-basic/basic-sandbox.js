@@ -4,19 +4,20 @@ var makeData = require('./utils/make-data');
 
 var render = require('./private/render');
 
-function BasicSandbox(options) {
-	options = makeOptions(options);
-    var data = makeData(options);
+function BasicSandbox(options, channel) {
+	this.options = makeOptions(options);
+    this.data = makeData(options);
+    this.channel = channel;
     
     this.el = document.createElement('div');
 	render.call(this);
 
-	this.options = options;
 }
 
 BasicSandbox.prototype = {
 	reset: require('./public/reset'),
-	run: require('./public/run')
+	run: require('./public/run'),
+	dispose: require('./public/dispose')
 };
 
 module.exports = BasicSandbox;

@@ -22,6 +22,11 @@ function RunCmd(options, channel) {
 		self.channel.emit('cmd:run');
 	});
 	
+	this.dispose = function() {
+		$el.off();
+		$el.remove();
+	};
+	
 }
 
 module.exports = RunCmd;
