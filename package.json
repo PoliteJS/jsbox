@@ -1,40 +1,41 @@
 {
   "name": "jsbox",
-  "version": "3.2.8",
+  "version": "4.0.0",
   "description": "jquery playground plugin for javascript",
-  "main": "Gruntfile.js",
-  "directories": {
-    "example": "examples"
-  },
+  "main": "Gulpfile.js",
   "scripts": {
-    "test": "grunt test"
+    "run": "gulp"
+  },
+  "keywords": [
+    "js",
+    "html",
+    "css",
+    "sandbox",
+    "console"
+  ],
+  "author": {
+    "name": "Marco Pegoraro",
+    "url": "http://jsbox.politejs.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/thepeg/jsbox.git"
+    "url": "https://github.com/PoliteJS/jsbox"
   },
-  "keywords": [
-    "jquery",
-    "plugin",
-    "javascript",
-    "sandbox",
-    "learn",
-    "exercise"
+  "licenses": [
+    {
+      "type": "MIT"
+    }
   ],
-  "author": "Marco Pegoraro",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/thepeg/jsbox/issues"
-  },
-  "homepage": "https://github.com/thepeg/jsbox",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-copy": "^0.5.0",
-    "grunt-contrib-clean": "^0.5.0",
-    "grunt-contrib-less": "^0.11.3",
-    "grunt-contrib-uglify": "^0.5.0",
-    "grunt-contrib-cssmin": "^0.10.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-banner": "^0.2.3"
+    "css-loader": "^0.9.0",
+    "gulp-workspace": "0.0.x",
+    "hogan.js": "^3.0.2",
+    "jqb-subscribable": "0.0.0",
+    "less": "^1.7.5",
+    "less-loader": "^0.7.8",
+    "loader-utils": "^0.2.5",
+    "mustache": "^0.8.2",
+    "style-loader": "^0.8.2",
+    "webpack": "^1.4.13"
   }
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    	<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<meta name="description" content="PoliteJS Workspace Boilerplace">
+		<meta name="keywords" content="spa, single page application, workspace, politejs">
+		<meta name="author" content="PoliteJS :: Marco Pegoraro @ThePeg">
+
+        <title>JSBox</title>
+        
+        <link rel="stylesheet" href="assets/css/bootstrap.css">
+        <link id="wks-css" rel="stylesheet" href="jsbox.css">
+    </head>
+    <body>
+        
+        <div class="container">
+            <div class="page-header">
+                <h2>JSBox Test</h2>
+            </div>
+        </div>
+        
+        <script src="assets/js/jquery.2.1.1.min.js"></script>
+        <script src="assets/js/ace.1.1.3.js"></script>
+        
+        <link id="wks-lib">
+        <script id="wks-app" src="jsbox.js"></script>
+        
+        <script>
+        jsbox.config({
+            panels: {
+                html: {
+                    // enabled: false,
+                    // type: function HtmlEditor() {console.log("HTML")}
+                    content: '<p>foo</p>'
+                },
+                css: {
+                    content: 'p {color:red}'
+                },
+                js: {
+                    content: 'console.log(123)'
+                }
+            }
+        });
+
+        var boxA = jsbox.create({
+            target: '.container'
+        });
+        
+        console.log(boxA);
+
+        setTimeout(boxA.run.bind(boxA), 100);
+        </script>
+        
+    </body>
+</html>
