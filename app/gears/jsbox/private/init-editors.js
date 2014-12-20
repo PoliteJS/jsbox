@@ -19,7 +19,7 @@ function JSBox__initEditors() {
 
 		// build editor instance
 		Editor = getConstructor(config.type, self.options.custom.editor);
-		editor = new Editor(language, config);
+		editor = new Editor(language, config, self.channel);
 
 		// set initial content
 		if (config.content) {

@@ -12,7 +12,7 @@ function JSBox__initSandbox() {
 	Sandbox = getConstructor(config.type, this.options.custom.sandbox);
 	
 	this.data.sandboxIsEnabled = config.enabled;
-	this.data.panels.sandbox = new Sandbox(config);
+	this.data.panels.sandbox = new Sandbox(config, this.channel);
 
 }
 

@@ -1,8 +1,8 @@
 /**
- * RunCmd
+ * FullScreenCmd
  */
 
 exports.defaults = {
-	label: 'Run',
+	label: 'Full Screen',
 	event: 'click'
 };

@@ -1,8 +1,8 @@
 /**
- * RunCmd
+ * ResetCmd
  */
 
 exports.defaults = {
-	label: 'Run',
+	label: 'Reset',
 	event: 'click'
 };

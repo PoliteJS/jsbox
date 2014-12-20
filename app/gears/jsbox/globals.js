@@ -32,18 +32,18 @@ exports.defaults = {
 			enabled: true,
 			type: 'default'
 		},
-		// reset: {
-		// 	enabled: false,
-		// 	type: 'default'
-		// },
-		// fullScreen: {
-		// 	enabled: false,
-		// 	type: 'default'
-		// },
-		// toggleConsole: {
-		// 	enabled: false,
-		// 	type: 'default'
-		// }
+		reset: {
+			enabled: true,
+			type: 'default'
+		},
+		fullScreen: {
+			enabled: true,
+			type: 'default'
+		},
+		toggleConsole: {
+			enabled: true,
+			type: 'default'
+		}
 	},
 	custom: {
 		template: {
@@ -61,6 +61,15 @@ exports.defaults = {
 		cmd: {
 			run: {
 				default: require('cmd-run/run-cmd')
+			},
+			reset: {
+				default: require('cmd-reset/reset-cmd')
+			},
+			fullScreen: {
+				default: require('cmd-full-screen/full-screen-cmd')
+			},
+			toggleConsole: {
+				default: require('cmd-toggle-console/toggle-console-cmd')
 			}
 		}
 	}

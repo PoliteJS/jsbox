@@ -1,12 +1,12 @@
 /**
- * RunCmd
+ * FullScreenCmd
  */
 
 var $ = require('jquery');
 
 var globals = require('./globals');
 
-function RunCmd(options, channel) {
+function FullScreenCmd(options, channel) {
 	var self = this;
 
 	this.options = $.extend(true, {}, globals.defaults, options || {});
@@ -15,13 +15,13 @@ function RunCmd(options, channel) {
 	this.el = document.createElement('button');
 
 	var $el = $(this.el);
-	$el.addClass('jsbox-cmd jsbox-cmd-run');
+	$el.addClass('jsbox-cmd jsbox-cmd-full-screen');
 	$el.html(this.options.label);
 
-	$el.on(this.options.event, function CmdRun__eventHandler() {
-		self.channel.emit('cmd:run');
+	$el.on(this.options.event, function FullScreenCmd__eventHandler() {
+		self.channel.emit('cmd:fullScreen');
 	});
 	
 }
 
-module.exports = RunCmd;
+module.exports = FullScreenCmd;

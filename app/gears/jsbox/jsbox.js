@@ -11,6 +11,7 @@ var initEditors = require('./private/init-editors');
 var initCommands = require('./private/init-commands');
 var initConsole = require('./private/init-console');
 var initSandbox = require('./private/init-sandbox');
+var initActions = require('./private/init-actions');
 var render = require('./private/render');
 var injectPanels = require('./private/inject-panels');
 var injectCommands = require('./private/inject-commands');
@@ -39,12 +40,16 @@ function JSBox(options) {
 
     injectPanels.call(this);
     injectCommands.call(this);
+
+    initActions.call(this);
     
     this.html = this.data.panels.html;
     this.js = this.data.panels.js;
     this.css = this.data.panels.css;
     this.console = this.data.panels.console;
     this.sandbox = this.data.panels.sandbox;
+
+    this.reset();
 
 }
 
@@ -55,7 +60,8 @@ function JSBox(options) {
 JSBox.prototype = {
 	dispose: require('./public/dispose'),
 	appendTo: require('./public/append-to'),
-    run: require('./public/run')
+    run: require('./public/run'),
+    reset: require('./public/reset')
 };
 
 module.exports = JSBox;

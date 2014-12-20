@@ -1,8 +1,8 @@
 /**
- * RunCmd
+ * ToggleConsoleCmd
  */
 
 exports.defaults = {
-	label: 'Run',
+	label: 'Toggle Console',
 	event: 'click'
 };

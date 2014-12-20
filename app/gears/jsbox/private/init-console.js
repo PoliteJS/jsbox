@@ -12,7 +12,7 @@ function JSBox__initConsole() {
 	Console = getConstructor(config.type, this.options.custom.console);
 
 	this.data.consoleIsEnabled = config.enabled;
-	this.data.panels.console = new Console(config);
+	this.data.panels.console = new Console(config, this.channel);
 
 }
 

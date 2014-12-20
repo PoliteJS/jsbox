@@ -25,7 +25,7 @@ function JSBox__initCommands() {
 		Command = getConstructor(config.type, self.options.custom.cmd[command]);
 
 		self.data['cmd' + ucFirst(command) + 'IsEnabled'] = config.enabled;
-		self.data.commands[command] = new Command(config);
+		self.data.commands[command] = new Command(config, self.channel);
 	}
 }
 
